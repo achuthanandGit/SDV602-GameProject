@@ -64,6 +64,7 @@
   <ItemGroup>
     <Compile Include="Assets\scripts\GameHomeController.cs" />
     <Compile Include="Assets\scripts\JackTinkuDialogueSceneController.cs" />
+    <Compile Include="Assets\scripts\StoryDescriptionTexts.cs" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>D:/achuthanandGit/SDV602/SDV602-GameProject/Game/Bunny, The Saviour!/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Assets.scripts;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -124,7 +125,7 @@ public class JackTinkuDialogueSceneController : MonoBehaviour
      */
     private void SetInitialTinkuDialogue()
     {
-        tinkuText.text = "Jack, Jack....!!";
+        tinkuText.text = StoryDescriptionTexts.TinkuStartDialog;
     }
 
     /**
@@ -139,7 +140,7 @@ public class JackTinkuDialogueSceneController : MonoBehaviour
 
     private void ShowInitialJackDialog()
     {
-        jackText.text = "Hey, Tinku. \n What happened? \n You feel so terrified.";
+        jackText.text = StoryDescriptionTexts.JackStartDialog;
     }
 
     /**
