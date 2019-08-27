@@ -34,6 +34,9 @@ public class GameRoomManager : MonoBehaviour
     // To define the CancelButton
     public Button CancelButton;
 
+    // To define whether the answer is correct or not
+    public bool IsCorrect = false;
+
     /**
     * Start method is used to initialize or assign values or actions to required 
     * variable or components before the first frame update
@@ -58,10 +61,12 @@ public class GameRoomManager : MonoBehaviour
         {
             MessagePanelText.text = "It's Correct.";
             MessagePanel.SetActive(true);
+            IsCorrect = true;
         } else
         {
             MessagePanelText.text = "It's wrong.";
             MessagePanel.SetActive(true);
+            IsCorrect = false;
         }
     }
 
@@ -106,8 +111,9 @@ public class GameRoomManager : MonoBehaviour
         MessagePanel.SetActive(false);
         if (IsTryingToExit)
             SceneManager.LoadScene("GameHome");
-        else
+        else if(IsCorrect)
             GetAndShowNextQuestion();
+
     }
 
     /**

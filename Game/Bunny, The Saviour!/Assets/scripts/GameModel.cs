@@ -80,7 +80,7 @@ namespace Assets.scripts
         private void MakeGameRoomInteraction()
         {
             QuestionOne = new Scene("What starts with a T, ends with a T, and has T in it.", "teapot");
-            QuestionOne.QuestionTwo = new Scene("I stand when I'm sitting, and jumo when I'm walking. Who am I?.", "kangaroo");
+            QuestionOne.QuestionTwo = new Scene("I stand when I'm sitting, and jump when I'm walking. Who am I?.", "kangaroo");
             QuestionOne.QuestionTwo.QuestionThree = new Scene("If you drop a yellow hat in the Red Sea what will it become?", "wet");
 
             CurrentQuestion = QuestionOne;
