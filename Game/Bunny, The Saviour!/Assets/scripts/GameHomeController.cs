@@ -8,33 +8,40 @@ using UnityEngine.UI;
 
 public class GameHomeController : MonoBehaviour
 {
- 
+    // To set the Game story 
     public Text GameDescription;
-    // This method is called when the script is activated. Here we can include the code to update the game objects when the scene is loading.
+
+    /**
+    * Start method is used to initialize or assign values or actions to required 
+    * variable or components before the first frame update
+    */
     void Start()
     {
         LoadGameDescription();
     }
 
-    
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    // This method is used to update the game description when the GameHome Scene is loaded
+    /**
+     * LoadGameDescription method is used to update the game description when the GameHome Scene is loaded
+     */
     private void LoadGameDescription()
     {
-        GameDescription.text = StoryDescriptionTexts.HomeDescriptionText;
+        GameDescription.text = GameManager.GameManagerInstance.GameModelInstance.DescriptionScene.Story;
     }
 
     /**
-     * this method will load the dialogue scenes between Jack and Tinku
+     *  LogoutUser is used to logout the user session
      */
-    public void LoadJackTinkuDialogScene()
+    public void LogoutUser()
+    {
+        string username = GameManager.GameManagerInstance.Username;
+        GameModel.UserLoginDetails[username]["status"] = "inactive";
+        SceneManager.LoadScene("LoginScene");
+    }
+
+    public void StartNewGame()
     {
         SceneManager.LoadScene("JackTinkuDialog");
     }
+
 }
