@@ -32,27 +32,47 @@ public class GameRoomManager : MonoBehaviour
     private int QuestionCount = 1;
 
     // To define the CancelButton
-    public Button CancelButton;
+    public GameObject CancelButton;
 
     // To define whether the answer is correct or not
-    public bool IsCorrect = false;
+    private bool IsCorrect = false;
 
-    /**
-    * Start method is used to initialize or assign values or actions to required 
-    * variable or components before the first frame update
-    */
+    // To define the initial health and updates as the game progress
+    private int PlayerHealth = 10;
+
+    // To define the player health
+    public Text PlayerHealthText;
+
+    // To track the time taken to finsish the game
+    private float StartTime;
+
+    // To define the timer for game
+    public Text GameTimerText;
+
+
+   
+    /// <summary>
+    /// Start method is used to initialize or assign values or actions to required 
+    /// variable or components before the first frame update.
+    /// </summary>
     void Start()
     {
         MessagePanel.SetActive(false);
-        CancelButton.enabled = false;
+        CancelButton.SetActive(false);
         PlayerDetailsPanel.SetActive(false);
         SetQuestionOne();
+        StartTime = Time.time;
     }
 
-   
-    /**
-     * ValidateAnswer is used to validate the answer
-     */
+    /// <summary>Updates this instance for each frame update</summary>
+    private void Update()
+    {
+        GameTimerText.text = (Time.time - StartTime).ToString("0.0");
+    }
+
+
+
+    /// <summary>Validates the answer.</summary>
     public void ValidateAnswer()
     {
         string messagePanelText = string.Empty;
@@ -70,9 +90,8 @@ public class GameRoomManager : MonoBehaviour
         }
     }
 
-    /**
-     * SetQuestionOne is used to set the first question when the game room is loaded
-     */
+   
+    /// <summary>Sets the question one when the game room is loaded.</summary>
     private void SetQuestionOne()
     {
         QuestionText.text = GameManager.GameManagerInstance.GameModelInstance.CurrentQuestion.Question;
@@ -80,45 +99,61 @@ public class GameRoomManager : MonoBehaviour
         QuestionCount++;
     }
 
-    /**
-     * ExitGame is used to exit from the game.
-     * As of now no game data will be saved, hence leaving game in between, later need to start from level 1
-     */
+    
+    /// <summary>Exits the game.</summary>
     public void ExitGame()
     {
         IsTryingToExit = true;
         MessagePanelText.text = "Game data won't be saved. Are you sure you want to leave.";
-        CancelButton.enabled = true;
+        CancelButton.SetActive(true);
         MessagePanel.SetActive(true);
     }
 
-    /**
-     * HandleCancelButton is used to handle the click event of cancel button in message panel,
-     * if clicked the user will stay in the program
-     */
+   
+    /// <summary>Handles the cancel button in message panel. Lets the user stay in the game.</summary>
     public void HandleCancelButton()
     {
-        CancelButton.enabled = false;
+        IsTryingToExit = false;
+        CancelButton.SetActive(false);
         MessagePanel.SetActive(false);
     }
 
-    /**
-     * HandleOkButton is used to handle the click event of ok button in message panel
-     */
+   
+    /// <summary>Handles the ok button in message panel.
+    /// If the message is 'wrong answer' or 'correct answer', Closes the message panel and loads next question.
+    /// If the messsage is about leaving the game room, then the game data will be saved and load the game home scene
+    /// </summary>
     public void HandleOkButton()
     {
-        CancelButton.enabled = false;
+        CancelButton.SetActive(false);
         MessagePanel.SetActive(false);
         if (IsTryingToExit)
+        {
+            GameManager.GameManagerInstance.GameModelInstance = new GameModel();
             SceneManager.LoadScene("GameHome");
-        else if(IsCorrect)
+        }
+        else if (IsCorrect)
             GetAndShowNextQuestion();
+        else if (!IsCorrect)
+            ReducePlayerHealth();
 
     }
 
-    /**
-     * GetAndShowNextQuestion is used to get and show next question when each question is answered correctly
-     */
+    /// <summary>Reduces the player health by 2 hearts.</summary>
+    private void ReducePlayerHealth()
+    {
+        PlayerHealth = PlayerHealth - 2;
+        PlayerHealthText.text = PlayerHealth.ToString();
+        if(PlayerHealth == 0)
+        {
+            IsTryingToExit = true;
+            MessagePanelText.text = "Game Over! \n You lost all your health.";
+            MessagePanel.SetActive(true);
+        }
+    }
+
+
+    /// <summary>Get and show next question when previous is answered correctly.</summary>
     private void GetAndShowNextQuestion()
     {
         AnswerInputField.text = string.Empty;
@@ -133,8 +168,32 @@ public class GameRoomManager : MonoBehaviour
                 resultList.AddRange(aCommandProcessor.GetNext("QuestionThree"));
                 break;
         }
-        QuestionText.text = resultList[0];
-        Answer = resultList[1];
-        QuestionCount++;
+        if (resultList.Count > 0)
+        {
+            QuestionText.text = resultList[0];
+            Answer = resultList[1];
+            QuestionCount++;
+        }
+    }
+
+    
+    /// <summary>Handles the game menu button. To show co-player details</summary>
+    public void HandleGameMenuButton()
+    {
+        PlayerDetailsPanel.SetActive(true);
+        if(GameManager.GameManagerInstance.GameMode == "random")
+        {
+            // need to implement later
+        } else
+        {
+            // need to implement later
+        }
+    }
+
+   
+    /// <summary>Handles the player ok button. Closes the player details panel.</summary>
+    public void HandlePlayerOkButton()
+    {
+        PlayerDetailsPanel.SetActive(false);
     }
 }

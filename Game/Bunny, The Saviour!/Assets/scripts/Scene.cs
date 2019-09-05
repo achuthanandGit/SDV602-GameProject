@@ -17,16 +17,17 @@ namespace Assets.scripts
         // To define the answer during game play
         public string Answer;
 
-        /**
-         * Constructor to assign values to Story variable
-         */
+       
+        /// <summary>Initializes a new instance of the <see cref="Scene"/> class.</summary>
+        /// <param name="pStory">The story.</param>
         public Scene(string pStory) {
             Story = pStory;
         }
 
-        /**
-         * Constructor to assign values to Question and Answer variables
-         */
+        
+        /// <summary>Initializes a new instance of the <see cref="Scene"/> class.</summary>
+        /// <param name="pQuestion">The question.</param>
+        /// <param name="pAnswer">The answer.</param>
         public Scene(string pQuestion, string pAnswer)
         {
             Question = pQuestion;

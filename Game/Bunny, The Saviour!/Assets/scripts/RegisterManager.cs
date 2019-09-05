@@ -1,6 +1,5 @@
 ﻿using Assets.scripts;
 using System;
-using System.Collections.Generic;
 using System.Net.Mail;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -26,9 +25,8 @@ public class RegisterManager : MonoBehaviour
     // RegisterSuccess is used to know whether the user register is successfull or not
     private bool RegisterSuccess;
 
-    /**
-     * Start is used to load the GameObjects or actions when the scene gets loaded
-     */
+
+    /// <summary>Start is used to load the GameObjects or actions when the scene gets loaded.</summary>
     void Start()
     {
         RegisterSuccess = false; 
@@ -36,9 +34,8 @@ public class RegisterManager : MonoBehaviour
         MessagePanel.SetActive(false);
     }
 
-    /**
-     * ClearAllTextField is used to clear all the text fields
-     */
+
+    /// <summary>Clears all text field.</summary>
     private void ClearAllTextField()
     {
         UsernameText.text = string.Empty;
@@ -46,18 +43,16 @@ public class RegisterManager : MonoBehaviour
         EmailText.text = string.Empty;
     }
 
-    /**
-     * CloseRegisterScene is used to close the RegisterScene when Cancel button is clicked
-     */
+
+    /// <summary>Closes the register scene when clicks Cancel button.</summary>
     public void CloseRegisterScene()
     {
         ClearAllTextField();
         SceneManager.LoadScene("LoginScene");
     }
 
-    /**
-     * CloseMessagePanel is used to close the message panel when ok button is clicked
-     */
+
+    /// <summary>CloseMessagePanel is used to close the message panel when clicks OK button.</summary>
     public void CloseMessagePanel()
     {
         MessagePanel.SetActive(false);
@@ -65,13 +60,14 @@ public class RegisterManager : MonoBehaviour
             SceneManager.LoadScene("LoginScene");
     }
 
-    /**
-     * RegisterNewUserData is used to register new data
-     * If any field is empty will throw error saying so
-     * If email is not valid throw error saying so
-     * If the username is already taken throw error saying so
-     * If all data is valid, new user details will be added to GameModel and will throw info saying so
-     */
+    
+    /// <summary>
+    /// Register the new user data.
+    /// If any field is empty will throw error saying so.
+    /// If email is not valid throw error saying so
+    /// If the username is already taken throw error saying so
+    /// If all data is valid, new user details will be added to GameModel and will throw info saying so
+    /// </summary>
     public void RegisterNewUserData()
     {
         if(string.IsNullOrWhiteSpace(UsernameText.text) ||
@@ -90,11 +86,12 @@ public class RegisterManager : MonoBehaviour
             MessagePanel.SetActive(true);
         } else
         {
-            Dictionary<string, string> userDataDictionary = new Dictionary<string, string>();
-            userDataDictionary.Add("password", PasswordText.text);
-            userDataDictionary.Add("email", EmailText.text);
-            userDataDictionary.Add("status", "inactive");
-            GameModel.UserLoginDetails.Add(UsernameText.text, userDataDictionary);
+            User objUser = new User();
+            objUser.Usser = UsernameText.text;
+            objUser.Pwd = PasswordText.text;
+            objUser.Mail = EmailText.text;
+            objUser.UserStatus = "inactive";
+            GameModel.UserLoginDetails.Add(UsernameText.text, objUser);
             MessagePanelText.text = "User has beed added successfully";
             MessagePanel.SetActive(true);
             RegisterSuccess = true;
@@ -103,18 +100,16 @@ public class RegisterManager : MonoBehaviour
         
     }
 
-    /**
-     * IsEmailValid is used to check whether the email id is valid or not
-     * return true if it is valid
-     * return false if it is not valid
-     * 
-     * emailaddress - emailId to check
-     */
-    private bool IsEmailValid(string emailaddress)
+
+    /// <summary>Determines whether [is email valid] [the specified emailaddress].</summary>
+    /// <param name="pEmailaddress">The emailaddress.</param>
+    /// <returns>
+    ///   <c>true</c> if [is email valid] [the specified emailaddress]; otherwise, <c>false</c>.</returns>
+    private bool IsEmailValid(string pEmailaddress)
     {
         try
         {
-            MailAddress m = new MailAddress(emailaddress);
+            MailAddress m = new MailAddress(pEmailaddress);
             return true;
         }
         catch (FormatException)

@@ -15,10 +15,15 @@ public class GameManager : MonoBehaviour
     // To know which user using this instance. Will set when the user successfull login and will be removed when logout
     public string Username;
 
-    /**
-     * Awake is used to initialize any variables or game state before the game starts.
-     * Called only once during the lifetime of the script instance.
-     */
+    // To define whether the user start a new game or join some random game
+    public string GameMode;
+
+    
+    /// <summary>
+    /// Awakes this instance.
+    /// Awake is used to initialize any variables or game state before the game starts.
+    /// Called only once during the lifetime of the script instance.
+    /// </summary>
     private void Awake()
     {
         if (GameManagerInstance is null)
@@ -36,9 +41,10 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    /**
-     * IsGameRunning is used to return the value of variable IsRunning
-     */
+   
+    /// <summary>Determines whether [is game running].</summary>
+    /// <returns>
+    ///   <c>true</c> if [is game running]; otherwise, <c>false</c>.</returns>
     public bool IsGameRunning()
     {
         return IsRunning;
