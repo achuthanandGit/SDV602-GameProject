@@ -150,6 +150,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Username: 
+  GameMode: 
 --- !u!4 &18818591
 Transform:
   m_ObjectHideFlags: 0
