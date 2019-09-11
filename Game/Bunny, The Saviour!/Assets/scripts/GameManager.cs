@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour
         {
             GameManagerInstance = this;
             IsRunning = true;
-            GameModelInstance = new GameModel();
+            GameModelInstance = new GameModel(Application.persistentDataPath + "/UserDetails.dat");
             GameModel.RetrieveData();
         }
         else

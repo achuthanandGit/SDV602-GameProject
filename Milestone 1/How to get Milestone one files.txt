@@ -1,0 +1,16 @@
+Please load the below link to download the ZIP file for Milestone one files
+
+https://github.com/achuthanandGit/SDV602-GameProject/archive/milestone_one_sub.zip
+
+
+
+Milestone one related documents, ppt and video is in folder 'Milestone 1'
+Since video is a large file the link to cloud is provided as shortcut.
+
+
+The folder 'Game' contains the Sample protocol game as per Milestone 1 requirements
+
+
+To check the files in Git load the below url and load the branch 'milestone_one_sub'
+	https://github.com/achuthanandGit/SDV602-GameProject
+	

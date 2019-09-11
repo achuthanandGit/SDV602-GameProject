@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using UnityEngine;
 
 namespace Assets.scripts
 {
     [Serializable]
     public class GameModel
     {
-        // Path store user login details
-        private static string FileName = "D:\\achuthanandGit\\SDV602\\SDV602-GameProject\\Game\\Bunny, The Saviour!\\Assets\\UserDetails.dat";
+        // Path to store user login details
+        private static string FileName;
 
         // To store the user details
         public static Dictionary<string, User> UserLoginDetails = new Dictionary<string, User>();
@@ -29,16 +30,29 @@ namespace Assets.scripts
         // To define current question
         public Scene CurrentQuestion;
 
-
         /// <summary>Initializes a new instance of the <see cref="GameModel"/> class.</summary>
         public GameModel()
+        {
+            GetAndSetGameData();
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="GameModel"/> class.</summary>
+        /// <param name="pFileName">path of the file.</param>
+        public GameModel(string pFileName)
+        {
+            FileName = pFileName;
+            GetAndSetGameData();
+        }
+
+        /// <summary>Gets the and set game data.</summary>
+        private void GetAndSetGameData()
         {
             MakeStoryDescription();
             MakeDialogue();
             MakeGameRoomInteraction();
         }
 
-        
+
         /// <summary>Makes the story description for Game Home scene.</summary>
         private void MakeStoryDescription()
         {
@@ -83,25 +97,40 @@ namespace Assets.scripts
             CurrentQuestion = QuestionOne;
         }
 
-      
+
+
         /// <summary>Saves the data.</summary>
         public static void SaveData()
         {
-            using (FileStream lcFileStream = new FileStream(FileName, FileMode.Create))
+            try
             {
                 BinaryFormatter lcFormatter = new BinaryFormatter();
+                FileStream lcFileStream = File.Create(FileName);
                 lcFormatter.Serialize(lcFileStream, UserLoginDetails);
+            } catch(IOException exception)
+            {
+                Debug.Log("IOException occurs when store game data: " + exception);
             }
         }
+
 
 
         /// <summary>Retrieves the data.</summary>
         public static void RetrieveData()
         {
-            using (FileStream lcFileStream = new FileStream(FileName, FileMode.Open))
+            try
             {
-                BinaryFormatter lcFormatter = new BinaryFormatter();
-                UserLoginDetails = (Dictionary<string, User>)lcFormatter.Deserialize(lcFileStream);
+                if (File.Exists(FileName))
+                {
+                    using (FileStream lcFileStream = new FileStream(FileName, FileMode.Open))
+                    {
+                        BinaryFormatter lcFormatter = new BinaryFormatter();
+                        UserLoginDetails = (Dictionary<string, User>)lcFormatter.Deserialize(lcFileStream);
+                    }
+                }
+            }catch (IOException exception)
+            {
+                Debug.Log("IOException occurs when load game data: " + exception);
             }
         }
 
