@@ -10,20 +10,16 @@
 
     public class NextCommand : Command
     {
-        /**
-         * Constructor to assign value to adverb
-         * 
-         * input {pAdverb (type-string)}
-         */
+        
+        /// <summary>Initializes a new instance of the <see cref="NextCommand"/> class.</summary>
+        /// <param name="pAdVerb">The adverb.</param>
         public NextCommand(string pAdVerb)
         {
             adverb = pAdVerb;
         }
 
-        /**
-         * Do is used to update the current scene of game instance 
-         * according to the user command or action
-         */
+        
+        /// <summary>Updates the current scene according to user command or action/summary>
         public override void Do()
         {
             Scene aScene = GameManager.GameManagerInstance.GameModelInstance.CurrentScene;
@@ -56,20 +52,15 @@
 
     public class AnswerQuestion : Command
     {
-        /**
-        * Constructor to assign value to adverb
-        * 
-        * input {pAdverb (type-string)}
-        */
+        /// <summary>Initializes a new instance of the <see cref="NextCommand"/> class.</summary>
+        /// <param name="pAdVerb">The adverb.</param>
         public AnswerQuestion(string pAdVerb)
         {
             adverb = pAdVerb;
         }
 
-        /**
-        * Do is used to update the current scene of game instance 
-        * according to the user command or action
-        */
+        
+        /// <summary>Updates the current scene according to user command or action/summary>
         public override void Do()
         {
             Scene aScene = GameManager.GameManagerInstance.GameModelInstance.CurrentQuestion;

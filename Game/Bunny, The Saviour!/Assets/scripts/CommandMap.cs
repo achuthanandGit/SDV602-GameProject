@@ -16,9 +16,11 @@ namespace Assets.scripts
         // used to set the answer
         public string Answer = string.Empty;
 
-        /**
-         * Constructor used to store values in CommandDictionary
-         */
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CommandMap"/> class.
+        /// Store values in CommandDictionary.
+        /// </summary>
         public CommandMap () {
             CommandDictionary = new Dictionary<string, Command>();
             CommandDictionary.Add("dialoguejackfirst", new NextCommand("DialogueJackFirst"));
@@ -31,12 +33,10 @@ namespace Assets.scripts
             CommandDictionary.Add("questionthree", new AnswerQuestion("QuestionThree"));
         }
 
-        /**
-         * RunCommand is used to run the command given by the user
-         * 
-         * input {pStrCommand (type-string} - command given by the user}
-         * output {result (type-bool) - true if command is valid else false}
-         */
+        
+        /// <summary>Runs the command.</summary>
+        /// <param name="pStrCommand">The string command.</param>
+        /// <returns>true/false</returns>
         public bool RunCommand(string pStrCommand)
         {
             Command aCommand;
@@ -50,12 +50,10 @@ namespace Assets.scripts
             return false;
         }
 
-        /**
-        * GetNextQuestion is used to get the next question when current question answer is correct
-        * 
-        * input {pStrCommand (type-string} - command given by the user}
-        * output {result (type-bool) - true if command is valid else false}
-        */
+        
+        /// <summary>Gets the next question.</summary>
+        /// <param name="pStrCommand">The string command.</param>
+        /// <returns>true/false</returns>
         public bool GetNextQuestion(string pStrCommand)
         {
             Command aCommand;

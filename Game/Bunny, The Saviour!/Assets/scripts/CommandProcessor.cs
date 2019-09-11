@@ -4,12 +4,10 @@ namespace Assets.scripts
 {
     class CommandProcessor
     {
-        /**
-         * ProcessAction is used to process the user input and will return the output action in the form of string
-         * 
-         * input {pCmdStr (type - string) - user action}
-         * output {strResult (type - string) - resultant action}
-         */
+      
+        /// <summary>Processes the the user input and will return the output action in the form of string.</summary>
+        /// <param name="pCmdStr">The p command string.</param>
+        /// <returns name="strResult">The resultant string.</returns>
         public string ProcessAction(string pCmdStr)
         {
             string strResult = "Sorry, I didn't get you.";
@@ -28,12 +26,10 @@ namespace Assets.scripts
                    "\n", strResult);
         }
 
-        /**
-         * GetNext is used to process the user input and will return the output action in the form of string
-         * 
-         * input {pCmdStr (type - string) - user action}
-         * output {listResult (type - List<string>) - resultant action}
-         */
+        
+        /// <summary>Gets is used to process the user input and will return the output action in the form of string.</summary>
+        /// <param name="pCmdStr">The p command string.</param>
+        /// <returns name="listResult">The resultant list.</returns>
         public List<string> GetNext(string pCmdStr)
         {
             List<string> listResult = new List<string>();

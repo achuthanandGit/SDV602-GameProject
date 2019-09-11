@@ -2,16 +2,18 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using UnityEngine;
 
 namespace Assets.scripts
 {
+    [Serializable]
     public class GameModel
     {
-        // To store user login details
-        private static string FileName = "D:\\achuthanandGit\\SDV602\\SDV602-GameProject\\Game\\Bunny, The Saviour!\\Assets\\UserDetails.dat";
+        // Path to store user login details
+        private static string FileName;
 
-        // To store user details
-        public static Dictionary<string, Dictionary<string, string>> UserLoginDetails = new Dictionary<string, Dictionary<string, string>>();
+        // To store the user details
+        public static Dictionary<string, User> UserLoginDetails = new Dictionary<string, User>();
 
         // To define current scene
         public Scene CurrentScene;
@@ -28,19 +30,30 @@ namespace Assets.scripts
         // To define current question
         public Scene CurrentQuestion;
 
-        /**
-         * Constructore to initailize the MakeDialogue method
-         */
+        /// <summary>Initializes a new instance of the <see cref="GameModel"/> class.</summary>
         public GameModel()
+        {
+            GetAndSetGameData();
+        }
+
+        /// <summary>Initializes a new instance of the <see cref="GameModel"/> class.</summary>
+        /// <param name="pFileName">path of the file.</param>
+        public GameModel(string pFileName)
+        {
+            FileName = pFileName;
+            GetAndSetGameData();
+        }
+
+        /// <summary>Gets the and set game data.</summary>
+        private void GetAndSetGameData()
         {
             MakeStoryDescription();
             MakeDialogue();
             MakeGameRoomInteraction();
         }
 
-        /**
-         * 
-         */
+
+        /// <summary>Makes the story description for Game Home scene.</summary>
         private void MakeStoryDescription()
         {
             DescriptionScene = new Scene("\t\t\t Once there lived a bunny, Jack with his parents Will and Pink in a village close to a furious jungle. In the deep jungle " +
@@ -53,9 +66,8 @@ namespace Assets.scripts
             " managed to escape from the monster and rushed to the village.");
         }
 
-        /**
-         * MakeDialogue is used to set the scene when an instance of GameModel is initialized
-         */
+        
+        /// <summary>Makes the dialogue. For the character interaction.</summary>
         private void MakeDialogue()
         {
             FirstScene = new Scene("Jack, Jack...!!");
@@ -74,9 +86,8 @@ namespace Assets.scripts
             CurrentScene = FirstScene;
         }
 
-        /**
-         * MakeGameRoomInteraction is used to set the question and answer session for the player to play game.
-         */
+        
+        /// <summary>Makes the game room interaction. Question & answer session.</summary>
         private void MakeGameRoomInteraction()
         {
             QuestionOne = new Scene("What starts with a T, ends with a T, and has T in it.", "teapot");
@@ -86,28 +97,42 @@ namespace Assets.scripts
             CurrentQuestion = QuestionOne;
         }
 
-        /**
-         * SaveData is used to save the user login details in a file
-         */
+
+
+        /// <summary>Saves the data.</summary>
         public static void SaveData()
         {
-            using (FileStream lcFileStream = new FileStream(FileName, FileMode.Create))
+            try
             {
                 BinaryFormatter lcFormatter = new BinaryFormatter();
+                FileStream lcFileStream = File.Create(FileName);
                 lcFormatter.Serialize(lcFileStream, UserLoginDetails);
+            } catch(IOException exception)
+            {
+                Debug.Log("IOException occurs when store game data: " + exception);
             }
         }
 
-        /**
-         * RetrieveData is used to retrieve saved user login details from a file
-         */
+
+
+        /// <summary>Retrieves the data.</summary>
         public static void RetrieveData()
         {
-            using (FileStream lcFileStream = new FileStream(FileName, FileMode.Open))
+            try
             {
-                BinaryFormatter lcFormatter = new BinaryFormatter();
-                UserLoginDetails = (Dictionary<string, Dictionary<string, string>>)lcFormatter.Deserialize(lcFileStream);
+                if (File.Exists(FileName))
+                {
+                    using (FileStream lcFileStream = new FileStream(FileName, FileMode.Open))
+                    {
+                        BinaryFormatter lcFormatter = new BinaryFormatter();
+                        UserLoginDetails = (Dictionary<string, User>)lcFormatter.Deserialize(lcFileStream);
+                    }
+                }
+            }catch (IOException exception)
+            {
+                Debug.Log("IOException occurs when load game data: " + exception);
             }
         }
+
     }
 }

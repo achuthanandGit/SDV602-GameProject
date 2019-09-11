@@ -630,9 +630,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MessagePanel: {fileID: 0}
+  MessagePanelText: {fileID: 0}
   UsernameText: {fileID: 0}
   PasswordText: {fileID: 0}
-  MessagePanelText: {fileID: 0}
 --- !u!1 &532930176
 GameObject:
   m_ObjectHideFlags: 0
@@ -1744,9 +1744,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MessagePanel: {fileID: 1059406280}
+  MessagePanelText: {fileID: 71307282}
   UsernameText: {fileID: 464831895}
   PasswordText: {fileID: 1346949823}
-  MessagePanelText: {fileID: 71307282}
 --- !u!1 &1942850682
 GameObject:
   m_ObjectHideFlags: 0
@@ -1968,6 +1968,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2006137181}
   - component: {fileID: 2006137182}
+  - component: {fileID: 2006137183}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -2002,6 +2003,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Username: 
+  GameMode: 
+--- !u!114 &2006137183
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2006137180}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b64a597bfb2bc7b478bb69b3fabb3151, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MessagePanel: {fileID: 1059406280}
+  MessagePanelText: {fileID: 71307282}
+  UsernameText: {fileID: 464831895}
+  PasswordText: {fileID: 1346949823}
 --- !u!1 &2058396374
 GameObject:
   m_ObjectHideFlags: 0
