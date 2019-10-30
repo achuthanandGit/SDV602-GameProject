@@ -1,4 +1,5 @@
 ﻿using Assets.scripts;
+using Assets.scripts.Domains;
 using System;
 using System.Net.Mail;
 using UnityEngine;
@@ -8,13 +9,13 @@ using UnityEngine.UI;
 public class RegisterManager : MonoBehaviour
 {
     // UsernameText to get username data
-    public Text UsernameText;
+    public InputField UsernameText;
 
     // PasswordText to get password data
-    public Text PasswordText;
+    public InputField PasswordText;
 
     // EmailText to get email data
-    public Text EmailText;
+    public InputField EmailText;
 
     // MessagePanel to show error/warning/info messages
     public GameObject MessagePanel;
@@ -23,13 +24,13 @@ public class RegisterManager : MonoBehaviour
     public Text MessagePanelText;
 
     // RegisterSuccess is used to know whether the user register is successfull or not
-    private bool RegisterSuccess;
+    private bool IsRegisterSuccess;
 
 
     /// <summary>Start is used to load the GameObjects or actions when the scene gets loaded.</summary>
     void Start()
     {
-        RegisterSuccess = false; 
+        IsRegisterSuccess = false; 
         ClearAllTextField();
         MessagePanel.SetActive(false);
     }
@@ -56,7 +57,7 @@ public class RegisterManager : MonoBehaviour
     public void CloseMessagePanel()
     {
         MessagePanel.SetActive(false);
-        if (RegisterSuccess)
+        if (IsRegisterSuccess)
             SceneManager.LoadScene("LoginScene");
     }
 
@@ -74,37 +75,49 @@ public class RegisterManager : MonoBehaviour
             string.IsNullOrWhiteSpace(PasswordText.text) ||
             string.IsNullOrWhiteSpace(EmailText.text))
         {
+            Debug.Log("Error in input");
             MessagePanelText.text = "Fill all required fields.";
             MessagePanel.SetActive(true);
         } else if (!IsEmailValid(EmailText.text))
         {
+            Debug.Log("Invlid email");
             MessagePanelText.text = "Email is invalid.";
             MessagePanel.SetActive(true);
-        } else if(GameModel.UserLoginDetails.ContainsKey(UsernameText.text))
+        } else if(GameModel.CheckDuplicateUser(UsernameText.text))
         {
+            Debug.Log("Duplicate user");
             MessagePanelText.text = "Username is already taken. Please use another one.";
             MessagePanel.SetActive(true);
         } else
         {
+            Debug.Log("Setting data for save");
             User objUser = new User();
-            objUser.Usser = UsernameText.text;
-            objUser.Pwd = PasswordText.text;
-            objUser.Mail = EmailText.text;
-            objUser.UserStatus = "inactive";
-            GameModel.UserLoginDetails.Add(UsernameText.text, objUser);
-            MessagePanelText.text = "User has beed added successfully";
+            objUser.Username = UsernameText.text;
+            objUser.Password = PasswordText.text;
+            objUser.Email = EmailText.text;
+            objUser.LoginStatus = "inactive";
+            if (GameModel.SaveNewUser(objUser))
+            {
+                Debug.Log("Successfull registration");
+                IsRegisterSuccess = true;
+                MessagePanelText.text = "User has beed added successfully";
+            } else
+            {
+                Debug.Log("Unsuccessfull registration");
+                MessagePanelText.text = "Unexpected error occurs. Please try again.";
+            }
+            // GameModel.UserLoginDetails.Add(UsernameText.text, objUser);
             MessagePanel.SetActive(true);
-            RegisterSuccess = true;
-        }
-
-        
+            
+        }        
     }
 
 
     /// <summary>Determines whether [is email valid] [the specified emailaddress].</summary>
     /// <param name="pEmailaddress">The emailaddress.</param>
     /// <returns>
-    ///   <c>true</c> if [is email valid] [the specified emailaddress]; otherwise, <c>false</c>.</returns>
+    ///   <c>true</c> if [is email valid] [the specified emailaddress]; otherwise, <c>false</c>.
+    ///  </returns>
     private bool IsEmailValid(string pEmailaddress)
     {
         try
@@ -112,8 +125,9 @@ public class RegisterManager : MonoBehaviour
             MailAddress m = new MailAddress(pEmailaddress);
             return true;
         }
-        catch (FormatException)
+        catch (FormatException exception)
         {
+            Debug.Log("FormatException happens when checking email is valid or not: " + exception);
             return false;
         }
     }

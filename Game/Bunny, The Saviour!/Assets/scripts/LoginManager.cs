@@ -1,7 +1,8 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-using Assets.scripts;
+﻿using Assets.scripts;
+using Assets.scripts.Domains;
+using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class LoginManager : MonoBehaviour
 {
@@ -12,16 +13,16 @@ public class LoginManager : MonoBehaviour
     public Text MessagePanelText;
 
     // UsernameText to get username data
-    public Text UsernameText;
+    public InputField UsernameText;
 
     // PasswordText to get password data
-    public Text PasswordText;
+    public InputField PasswordText;
 
        
     /// <summary>Start is used to load the GameObjects or actions when the scene gets loaded</summary>
     void Start()
     {
-        MessagePanel.SetActive(false);
+       // MessagePanel.SetActive(false);
     }
 
     
@@ -36,37 +37,28 @@ public class LoginManager : MonoBehaviour
         if (string.IsNullOrWhiteSpace(UsernameText.text) ||
             string.IsNullOrWhiteSpace(PasswordText.text))
         {
+            Debug.Log("Input data error");
             MessagePanelText.text = "Fill all required fields.";
             MessagePanel.SetActive(true);
-        }
-        else if (CheckLogin(UsernameText.text, PasswordText.text))
+        } else
         {
-            GameManager.GameManagerInstance.Username = UsernameText.text;
-            GameModel.UserLoginDetails[UsernameText.text].UserStatus = "active";
-            SceneManager.LoadScene("GameHome");
-        }   
-        else
-        {
-            MessagePanelText.text = "Username/Password is wrong. please try again with valid data.";
-            MessagePanel.SetActive(true);
+            User currentUser = GameModel.CheckLogin(UsernameText.text, PasswordText.text);
+            if(currentUser is null) {
+                Debug.Log("Login Error");
+                MessagePanelText.text = "Username/Password is wrong. please try again with valid data.";
+                MessagePanel.SetActive(true);
+            }
+            else
+            {
+                Debug.Log("Successfull Login");
+                GameModel.Username = UsernameText.text;
+                GameModel.CurrentUser = currentUser;
+                SceneManager.LoadScene("GameHome");
+            }
         }
     }
 
-    /// <summary>
-    /// CheckLogin will check the username and password if username doesn't exists or username 
-    /// password combination doesn't exists, will return false
-    /// return true if username and password combination is valid.
-    /// </summary>
-    /// 
-    /// <param name="pUsername">The username.</param>
-    /// <param name="pPassword">The password.</param>
-    /// <returns>bool</returns>
-    public static bool CheckLogin(string pUsername, string pPassword)
-    {
-        return (GameModel.UserLoginDetails.ContainsKey(pUsername) &&
-            GameModel.UserLoginDetails[pUsername].Pwd == pPassword);
-    }
-
+   
     /// <summary>
     /// Handles the message panel button.
     /// Close the message panel when OK button is clicked

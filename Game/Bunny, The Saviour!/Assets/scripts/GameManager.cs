@@ -1,24 +1,14 @@
 ﻿using Assets.scripts;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    // used to know whether the game is running or not
-    private bool IsRunning;
+  
+    private GameManager GameManagerInstance;
 
-    // Static instance of GameManager which allows it to be accessed by any other script.
-    public static GameManager GameManagerInstance;
 
-    // Instance of GameModel
-    public GameModel GameModelInstance;
-
-    // To know which user using this instance. Will set when the user successfull login and will be removed when logout
-    public string Username;
-
-    // To define whether the user start a new game or join some random game
-    public string GameMode;
-
-    
     /// <summary>
     /// Awakes this instance.
     /// Awake is used to initialize any variables or game state before the game starts.
@@ -28,25 +18,29 @@ public class GameManager : MonoBehaviour
     {
         if (GameManagerInstance is null)
         {
+            Debug.Log("Initiating the GameManager");
             GameManagerInstance = this;
-            IsRunning = true;
-            GameModelInstance = new GameModel(Application.persistentDataPath + "/UserDetails.dat");
-            GameModel.RetrieveData();
+            // Creating local database if not exists
+            Debug.Log("Creating Database");
+            GameModel.GetAndSetGameData();
+
+
+            //string filePath = Application.persistentDataPath + "/UserDetails.dat";
+            //GameModelInstance = new GameModel(Application.persistentDataPath + "/UserDetails.dat");
+            //GameModel.RetrieveData();
         }
         else
         {
-            GameModel.SaveData();
+            //GameModel.SaveData();
             Destroy(gameObject);
-            IsRunning = false;
         }
     }
 
-   
     /// <summary>Determines whether [is game running].</summary>
     /// <returns>
     ///   <c>true</c> if [is game running]; otherwise, <c>false</c>.</returns>
     public bool IsGameRunning()
     {
-        return IsRunning;
+        return true;
     }
 }

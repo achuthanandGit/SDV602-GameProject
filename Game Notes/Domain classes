@@ -1,0 +1,52 @@
+Problem domain
+	The game is a rescue mission by answering certain brain teaser questions. 
+	The game includes chat application which allows the users to chat between. Chat is allowed for those who are in same game
+	
+
+
+
+List of domain classes needed for my game application
+
+1. UserDetails
+	UserID
+	Username
+	Password
+	LoginStatus
+	GamesWon
+	HighScore
+	LastLogIn
+
+2. GameData	
+	GameID
+	BestHealth
+	BestTime
+	CreateDateTime
+
+3. UserGame
+	GameID
+	UserID
+	Health
+	CurrentLevel
+	TimeTaken
+	IsFinished
+	IsWon
+	StartDateTime
+	EndDateTime
+
+4. StoreChatDetails
+	GameID
+	SentUserID
+	ChatData
+	SentTime
+	
+5. ShowNotifcation
+	ChatID
+	GameID	
+	IsNewMsg
+	
+6. SceneDetails
+	SceneID
+	Question
+	Answer
+	Level
+	

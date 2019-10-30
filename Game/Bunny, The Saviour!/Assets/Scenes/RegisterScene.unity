@@ -239,9 +239,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9db705e346edb3149855cf103ffb36b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  UsernameText: {fileID: 2011165657}
-  PasswordText: {fileID: 2059734737}
-  EmailText: {fileID: 1748300586}
+  UsernameText: {fileID: 1433041602}
+  PasswordText: {fileID: 220832913}
+  EmailText: {fileID: 281760484}
   MessagePanel: {fileID: 304794217}
   MessagePanelText: {fileID: 1499273076}
 --- !u!1 &220832911

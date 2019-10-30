@@ -1,138 +1,203 @@
-﻿using System;
+﻿using Assets.scripts.Domains;
+using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Linq;
 using UnityEngine;
 
 namespace Assets.scripts
 {
-    [Serializable]
-    public class GameModel
+
+    public static class GameModel
     {
-        // Path to store user login details
-        private static string FileName;
+        // used to know whether the game is running or not
+        public static bool IsRunning;
 
-        // To store the user details
-        public static Dictionary<string, User> UserLoginDetails = new Dictionary<string, User>();
+        // To know which user using this instance. Will set when the user successfull login and will be removed when logout
+        public static string Username;
 
-        // To define current scene
-        public Scene CurrentScene;
+        // To define whether the user start a new game or join some random game
+        public static string GameMode;
+        
+        // To define the game description
+        public static Scene GameHomeDescription;
 
-        // To define the story description
-        public Scene DescriptionScene;
+        // To define the scene details to show the dialogue delivery
+        public static List<SceneData> DialogueList = new List<SceneData>();
 
-        // To define first scene
-        public Scene FirstScene;
+        // To save the current login user
+        public static User CurrentUser;
 
-        // To define Question one in game room;
-        public Scene QuestionOne;
+        // To define user game data
+        public static UserGameData UserGameData;
 
-        // To define current question
-        public Scene CurrentQuestion;
+        // To save current game details
+        public static GameData gameData;
 
-        /// <summary>Initializes a new instance of the <see cref="GameModel"/> class.</summary>
-        public GameModel()
-        {
-            GetAndSetGameData();
-        }
+        // To define the game scene data according to levels
+        public static IDictionary<int, List<SceneData>> playSceneMap = new Dictionary<int, List<SceneData>>();
 
-        /// <summary>Initializes a new instance of the <see cref="GameModel"/> class.</summary>
-        /// <param name="pFileName">path of the file.</param>
-        public GameModel(string pFileName)
-        {
-            FileName = pFileName;
-            GetAndSetGameData();
-        }
+        // To define the current level scene list
+        public static List<SceneData> currentLevelSceneList = new List<SceneData>();
+
+        // To define the current level
+        public static int currentLevel;
+
+        // To define how many need to pass to complete the current level
+        public static int currentLevelTotalCount;
+
 
         /// <summary>Gets the and set game data.</summary>
-        private void GetAndSetGameData()
+        public static void GetAndSetGameData()
         {
-            MakeStoryDescription();
-            MakeDialogue();
-            MakeGameRoomInteraction();
-        }
+            // creating game database if required
+            Debug.Log("Creating database");
+            var dataServiceObj = new DataService("gameDB.db");
 
+            // creating game tables if required
+            Debug.Log("Creating Tables");
+            dataServiceObj.CreateRequiredTables();
+
+            // inserting base game data 
+            Debug.Log("Inserting game data");
+            dataServiceObj.InsertBaseGameData();
+
+            Debug.Log("Getting game Data");
+            MakeGameData();
+            // MakeGameRoomInteraction();
+        }
 
         /// <summary>Makes the story description for Game Home scene.</summary>
-        private void MakeStoryDescription()
+        public static void MakeGameData()
         {
-            DescriptionScene = new Scene("\t\t\t Once there lived a bunny, Jack with his parents Will and Pink in a village close to a furious jungle. In the deep jungle " +
-            "there also lived a fearsome monster in the castle who preyed on innocent animals. One day, Will and Pink along with their neighbour Tinku Duck " +
-            "went to the jungle in search of fruits, vegetables and firewood. They were not able to find enough fruits in the outer jungle, so they went deep " +
-            "into the forest.As they went deep, there was a garden full of fruits and vegetables. They ran into the garden without thinking twice to pick the fruits. " +
-            "They are not aware of that it is monster's garden. " + "\n" +
-            "\t\t\t They plucked enough fruits and were relaxing in the meadow. By that time the monster came back from his hunting. He saw these three uninvited animals" +
-            " trespassed in his garden and found that they took his fruits without his permission. He got angry, rushed towards them caught Will and Pink Somehow Tinku" +
-            " managed to escape from the monster and rushed to the village.");
+            List<SceneData>  gameSceneList = DataService.GetGameSceneData();
+            if (gameSceneList != null && gameSceneList.Count > 0)
+            {
+                Debug.Log("Successfully retrievs game data.");
+                // getting the game description data from the scene list
+                SceneData GameDescData = gameSceneList.First(scene => scene.SceneId == 1111);
+                GameHomeDescription = new Scene(GameDescData.Question);
+                Debug.Log(GameHomeDescription);
+                // getting dialog scene data according to the dialog delivery order
+                DialogueList = gameSceneList.Where(scene => scene.SceneId >= 1112)
+                    .OrderBy(scene => scene.SceneId).ToList();
+                Debug.Log(DialogueList);
+                // minimizing the GameSceneList to the data required to activate the game room
+                gameSceneList = gameSceneList.Except(DialogueList).ToList();
+                gameSceneList.Remove(GameDescData);
+                playSceneMap = gameSceneList.GroupBy(scene => scene.Level)
+                                            .ToDictionary(scene => scene.Key, scene => scene.ToList());
+            }
+            else
+                Debug.Log("Failed to retrieve game data");
         }
 
         
-        /// <summary>Makes the dialogue. For the character interaction.</summary>
-        private void MakeDialogue()
-        {
-            FirstScene = new Scene("Jack, Jack...!!");
-            FirstScene.DialogueJackFirst = new Scene("Hey Tinku. \n What happened? \n You seems to be so terrified.");
-            FirstScene.DialogueJackFirst.DialogueTinkuSecond =
-                new Scene("That monster!! \n He got your parents.");
-            FirstScene.DialogueJackFirst.DialogueTinkuSecond.DialogueJackSecond =
-                new Scene("What, What happened?");
-            FirstScene.DialogueJackFirst.DialogueTinkuSecond.DialogueJackSecond.DialogueFinal =
-                new Scene("I am gonna kill that monster and save them. $ Tinku explained what actually happened back in the jungle.");
-            FirstScene.DialogueJackFirst.DialogueTinkuSecond.DialogueJackSecond.DialogueFinal.GatherInfo =
-                new Scene("Jack learned from village elders that the monster won't kill his parent but will enslave them till they die. He realized that he can actually save his parents by " +
-                    "completing certain tasks which will let him inside the castle. So he marched to the monster's castle.");
 
-            // setting the first scene as current scene in the dialogue delivery session
-            CurrentScene = FirstScene;
+        /// <summary>Saves the new user.</summary>
+        /// <param name="pObjUser">The object user.</param>
+        /// <returns>
+        ///     true: if user data saved successfully
+        ///     false: if user data fail to save       
+        /// </returns>
+        public static bool SaveNewUser(User pObjUser)
+        {
+            return DataService.SaveNewUser(pObjUser);
         }
 
+        /// <summary>Checks the duplicate user.</summary>
+        /// <param name="pUsername">The username.</param>
+        /// <returns>
+        ///    true: if username already exists
+        ///    false: if username not taken
+        /// </returns>
+        public static bool CheckDuplicateUser(string pUsername)
+        {
+            return DataService.CheckDuplicateUser(pUsername);
+        }
+
+        /// <summary>Validates the username and password combination.</summary>
+        /// <param name="pUsername">The username.</param>
+        /// <param name="pPassword">The password.</param>
+        /// <returns>
+        ///    User: If the given values are valid
+        ///    null: if the given values are not valid
+        /// </returns>
+        public static User CheckLogin(string pUsername, string pPassword)
+        {
+            return DataService.CheckLogin(pUsername, pPassword);
+        }
+
+        /// <summary>Logouts the user.</summary>
+        /// <param name="pUsername">The username.</param>
+        public static void LogoutUser(string pUsername)
+        {
+            DataService.LogoutUser(pUsername);
+        }
+
+        /// <summary>Updates the user game data.</summary>
+        /// <param name="pCurrentUser">The current user.</param>
+        /// <param name="pUserGameData">The user game data.</param>
+        public static void UpdateUserGameData(User pCurrentUser, UserGameData pUserGameData)
+        {
+            DataService.UpdateUserGameData(GameModel.CurrentUser, GameModel.UserGameData);
+        }
+
+
+        /// <summary>Retrievs the payerlist in a game.</summary>
+        /// <returns>
+        ///     List<UserGameData>: If no issues happens while getting data
+        ///     null: If any exceptions when getting data
+        /// </returns>
+        public static List<UserGameData> GetGamePayerlist()
+        {
+            return DataService.GetGamePlayerList(gameData.GameId);
+        }
+
+        /// <summary>Starts the new game.</summary>
+        public static void StartNewGame()
+        {
+            // generating random gameId for the uniqueness processs
+            System.Random rnd = new System.Random((int)DateTime.Now.Ticks);
+            int gameId = rnd.Next();
+            gameData = DataService.StartNewGame(gameId);
+        }
+
+        /// <summary>Gets the updated game data.</summary>
+        /// <param name="pGameId">The game identifier.</param>
+        /// <returns>
+        ///     GameData obj: if data retrieved successfully
+        ///     null : if error happens
+        /// </returns>
+        internal static GameData GetUpdatedGameData(int pGameId)
+        {
+            return DataService.GetUpdatedGameData(pGameId);
+        }
         
-        /// <summary>Makes the game room interaction. Question & answer session.</summary>
-        private void MakeGameRoomInteraction()
+        /// <summary>Gets the random game to join.</summary>
+        /// <returns>
+        ///     true: If able to find random game
+        ///     false: If not able to fins random game
+        /// </returns>
+        public static bool GetRandomGameToJoin()
         {
-            QuestionOne = new Scene("What starts with a T, ends with a T, and has T in it.", "teapot");
-            QuestionOne.QuestionTwo = new Scene("I stand when I'm sitting, and jump when I'm walking. Who am I?.", "kangaroo");
-            QuestionOne.QuestionTwo.QuestionThree = new Scene("If you drop a yellow hat in the Red Sea what will it become?", "wet");
-
-            CurrentQuestion = QuestionOne;
-        }
-
-
-
-        /// <summary>Saves the data.</summary>
-        public static void SaveData()
-        {
-            try
+            List<GameData> gameList = DataService.GetAvailableGameList();
+            if (gameList.Count == 0)
+                return false;
+            else
             {
-                BinaryFormatter lcFormatter = new BinaryFormatter();
-                FileStream lcFileStream = File.Create(FileName);
-                lcFormatter.Serialize(lcFileStream, UserLoginDetails);
-            } catch(IOException exception)
-            {
-                Debug.Log("IOException occurs when store game data: " + exception);
+                // getting random game to join from the list of active games
+                System.Random rnd = new System.Random((int)DateTime.Now.Ticks);
+                int randomIndex = rnd.Next(gameList.Count);
+                gameData = gameList[randomIndex];
+                return true;
             }
         }
 
-
-
-        /// <summary>Retrieves the data.</summary>
-        public static void RetrieveData()
+        /// <summary>Updates the game data.</summary>
+        /// <param name="pGameDate">The game date.</param>
+        internal static void UpdateGameData(GameData pGameDate)
         {
-            try
-            {
-                if (File.Exists(FileName))
-                {
-                    using (FileStream lcFileStream = new FileStream(FileName, FileMode.Open))
-                    {
-                        BinaryFormatter lcFormatter = new BinaryFormatter();
-                        UserLoginDetails = (Dictionary<string, User>)lcFormatter.Deserialize(lcFileStream);
-                    }
-                }
-            }catch (IOException exception)
-            {
-                Debug.Log("IOException occurs when load game data: " + exception);
-            }
+            DataService.UpdateGameData(pGameDate);
         }
-
     }
 }
