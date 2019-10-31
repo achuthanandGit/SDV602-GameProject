@@ -189,6 +189,7 @@ namespace Assets.scripts
                 System.Random rnd = new System.Random((int)DateTime.Now.Ticks);
                 int randomIndex = rnd.Next(gameList.Count);
                 gameData = gameList[randomIndex];
+                DataService.UpdateUserGameData(gameData.GameId);
                 return true;
             }
         }

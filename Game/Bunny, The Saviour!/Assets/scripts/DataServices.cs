@@ -294,7 +294,7 @@ public class DataService
     /// <exception cref="SQLiteException">
     ///     If any error happens while updating user game data
     /// </exception>
-    private static void UpdateUserGameData(int pGameId)
+    public static void UpdateUserGameData(int pGameId)
     {
         try
         {

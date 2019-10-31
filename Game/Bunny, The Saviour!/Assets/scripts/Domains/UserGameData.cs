@@ -10,7 +10,9 @@ namespace Assets.scripts.Domains
     /// <summary>Domain class to store game related user data</summary>
     [Serializable]
     public class UserGameData
-    {
+
+    { 
+        private int _Id;
         private int _GameId;
         private string _Username;
         private int _Health;
@@ -21,9 +23,9 @@ namespace Assets.scripts.Domains
         private DateTime _StartDateTime;
         private DateTime _EndDateTime;
 
-        [PrimaryKey]
+        [PrimaryKey, AutoIncrement]
+        public int Id { get => _Id; set => _Id = value; }
         public int GameId { get => _GameId; set => _GameId = value; }
-        
         public string Username { get => _Username; set => _Username = value; }
         public int Health { get => _Health; set => _Health = value; }
         public double TimeTaken { get => _TimeTaken; set => _TimeTaken = value; }

@@ -166,7 +166,7 @@ namespace Assets.scripts
                     Level = 4
                 },
                 new SceneData{
-                    SceneId = 15,
+                    SceneId = 16,
                     Question = "You lit the candle, the bookshelves moved to different directions and a path appeared in front of you  and it appeared in map too. You took the way  and ended up in a beautiful room. The map directed you to a flower vase with a bunch of flowers. The next riddle appeared. \n\n"+
                                 "'Soft and fragile is my skin, I get my growth in mud\n"+
                                    "I’m dangerous as much as pretty, for if not careful, I draw blood'",
@@ -174,45 +174,45 @@ namespace Assets.scripts
                     Level = 4
                 },
                 new SceneData{
-                    SceneId = 16,
+                    SceneId = 17,
                     Question = "You took a thorn. You poked yourself with the thorn and put a drop of blood on the map. Map shown the way to a room where different metal ores were kept. You have to identify the one which map tells \n"+
                                 "\n'I drive men mad, \nFor love of me, \nEasily beaten \nNever free",
                     Answer = "gold",
                     Level = 4
                 },
                 new SceneData{
-                    SceneId = 17,
+                    SceneId = 18,
                     Question = "From that room the map took you to a tiny cellar. He saw the blue drink in a jug. But you cannot touch the jar until you wear what the map says \n"+
                                 "\n'A mile from end to end, yet as close to as a friend. A precious commodity, freely given. Seen on the dead and on the living. Found on the rich, poor, short and tall, but shared among children most of all.'",
                     Answer = "smile",
                     Level = 4
                 },
                 new SceneData{
-                    SceneId = 18,
+                    SceneId = 19,
                     Question = "The foolish man wastes me, The average man spends me, And wise man invests me, Yet all men succumb to me. What am I? ",
                     Answer = "time",
                     Level = 5
                 },
                 new SceneData{
-                    SceneId = 19,
+                    SceneId = 20,
                     Question = "It can pierce the best armor, And make swords crumble with a rub. Yet for all its power, It can’t harm a club.",
                     Answer = "rust",
                     Level = 5
                 },
                 new SceneData{
-                    SceneId = 20,
+                    SceneId = 21,
                     Question = "Lives without a body, hears without ears, speaks without a mouth, to which the air alone gives birth.",
                     Answer = "echo",
                     Level = 5
                 },
                 new SceneData{
-                    SceneId = 21,
+                    SceneId = 22,
                     Question = "A merchant can place 8 large boxes or 10 small boxes into a carton for shipping. In one shipment, he sent a total of 96 boxes. If there are more large boxes than small boxes, how many cartons did he ship?",
                     Answer = "11",
                     Level = 5
                 },
                 new SceneData{
-                    SceneId = 22,
+                    SceneId = 23,
                     Question = "A sphere has three, a circle has two, and a point has zero. What is it?",
                     Answer = "dimensions",
                     Level = 5
