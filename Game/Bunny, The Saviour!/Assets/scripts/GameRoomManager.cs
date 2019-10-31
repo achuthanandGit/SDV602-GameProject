@@ -77,8 +77,6 @@ public class GameRoomManager : MonoBehaviour
     // To define Score template
     public Transform TestTemplate;
 
-
-
     // To define game objects to destroy
     private List<GameObject> DestroyList = new List<GameObject>();
 
@@ -105,6 +103,7 @@ public class GameRoomManager : MonoBehaviour
             GameTimerText.text = (Time.time - StartTime).ToString("0.0");
     }
 
+    /// <summary>Shows the first message dialog box when game starts</summary>
     private void ShowGameStartDialog()
     {
         MessagePanelText.text = "By clicking OK you are ready to start the game. Complete level 1 to enter into the castle.";
@@ -140,37 +139,44 @@ public class GameRoomManager : MonoBehaviour
     }
 
 
-    /// <summary>Checks the level and get next scene.</summary>
+    /// <summary>Checks the level and get next scene and updates the game related player information in the database.</summary>
     private void CheckLevelAndGetNext()
     {
+        // checking whether the current level is completed and ready to load next level
         if (GameModel.currentLevelTotalCount == QuestionCount)
         {
+            // loading message to show when each level successfully completes
             MessagePanelText.text = GetMessageForLevelPass();
-
             if (UpdateGameSceneDataLists())
             {
+                // updates the game related user informaion
                 UpdateUserGameData();
                 QuestionCount = 0;
                 MessagePanel.SetActive(true);
+                // updating UI for level
                 LevelText.text = "Level " + GameModel.currentLevel;
                 AnswerInputField.text = string.Empty;
                 IsCorrect = true;
             }
             else
             {
+                // when the player finish the game successfully
                 MessagePanelText.text = "You have successfully completed all tasks and Saved the Parents. You are brave.";
                 MessagePanel.SetActive(true);
                 IsStartGame = false;
                 IsGameFinished = true;
+                // updates the game related user informaion
                 UpdateUserGameData();
             }
         }
         else
         {
+            // loading the next scene in the current level
             SceneData sceneData = GameModel.currentLevelSceneList[QuestionCount];
             QuestionText.text = sceneData.Question;
             Answer = sceneData.Answer;
             QuestionCount++;
+            // updates the game related user informaion
             UpdateUserGameData();
         }
     }
@@ -178,19 +184,24 @@ public class GameRoomManager : MonoBehaviour
     /// <summary>Updates the user game data.</summary>
     private void UpdateUserGameData()
     {
-    
+        // checking whether the game is running or not
         if (!IsStartGame)
         {
+            // Checking the current player health is better than the previous game
             if (PlayerHealth > GameModel.CurrentUser.BestHealth)
                 GameModel.CurrentUser.BestHealth = PlayerHealth;
+            // Checking the current time took is better than the previous game
             if (Convert.ToDouble(GameTimerText.text) > GameModel.CurrentUser.BestTime)
                 GameModel.CurrentUser.BestTime = Convert.ToDouble(GameTimerText.text);
+            // check whether the game is finishe or not
             if(IsGameFinished)
             {
+                // updating the user and game related user data
                 GameModel.CurrentUser.GamesWon = GameModel.CurrentUser.GamesWon + 1;
                 GameModel.UserGameData.IsWon = true;
                 GameModel.UserGameData.IsFinished = true;
                 GameModel.UserGameData.EndDateTime = DateTime.Now;
+                // updating game related data when the game is finished
                 UpdateGameData();
             }
         }
@@ -198,7 +209,7 @@ public class GameRoomManager : MonoBehaviour
         {
             GameModel.UserGameData.IsFinished = false;
         }
-
+        // Updating the game realted user data 
         GameModel.UserGameData.Health = PlayerHealth;
         GameModel.UserGameData.TimeTaken = Convert.ToDouble(GameTimerText.text);
         GameModel.UserGameData.CurrentLevel = GameModel.currentLevel;
@@ -315,7 +326,7 @@ public class GameRoomManager : MonoBehaviour
         }
     }
 
-    /// <summary>Reduces the player health by 2 hearts.</summary>
+    /// <summary>Reduces the player health by 2 hearts when inputs wrong answer.</summary>
     private void ReducePlayerHealth()
     {
         PlayerHealth = PlayerHealth - 2;
@@ -326,6 +337,7 @@ public class GameRoomManager : MonoBehaviour
             MessagePanelText.text = "Game Over! \n You lost all your health.";
             MessagePanel.SetActive(true);
         }
+        // updating game related user data
         UpdateUserGameData();
     }
 
@@ -334,12 +346,13 @@ public class GameRoomManager : MonoBehaviour
     /// <summary>Handles the game menu button. To show co-player details</summary>
     public void HandleGameMenuButton()
     {
+        // getting palyer list of the game currently running
         List<UserGameData> userList = GameModel.GetGamePayerlist();
         
         float templateHeight = 30f;
         int index = 0;
+        // duplicating the score template for showing each user details
         userList.ForEach(user => {
-
             Transform scoreTransform = Instantiate(ScoreTemplate, ScoreTemplateContainer);
             RectTransform scoreRectTransform = scoreTransform.GetComponent<RectTransform>();
             scoreRectTransform.anchoredPosition = new Vector2(0, -templateHeight * index);
@@ -356,7 +369,6 @@ public class GameRoomManager : MonoBehaviour
     /// <summary>Handles the player ok button. Closes the player details panel.</summary>
     public void HandlePlayerOkButton()
     {
-
         PlayerDetailsPanel.SetActive(false);
         DestroyList.ForEach(gameObject => Destroy(gameObject));
         DestroyList.Clear();

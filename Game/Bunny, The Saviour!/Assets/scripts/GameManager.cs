@@ -3,9 +3,11 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>First class to initiated when the game starts to call static class GameMode</summary>
 public class GameManager : MonoBehaviour
 {
   
+    // to define the current GameManager instance
     private GameManager GameManagerInstance;
 
 
@@ -22,18 +24,11 @@ public class GameManager : MonoBehaviour
             GameManagerInstance = this;
             // Creating local database if not exists
             Debug.Log("Creating Database");
+            // setting all the game realted data for the first time
             GameModel.GetAndSetGameData();
-
-
-            //string filePath = Application.persistentDataPath + "/UserDetails.dat";
-            //GameModelInstance = new GameModel(Application.persistentDataPath + "/UserDetails.dat");
-            //GameModel.RetrieveData();
         }
         else
-        {
-            //GameModel.SaveData();
             Destroy(gameObject);
-        }
     }
 
     /// <summary>Determines whether [is game running].</summary>

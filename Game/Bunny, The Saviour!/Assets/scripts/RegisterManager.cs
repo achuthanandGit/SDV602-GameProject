@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+/// <summary>Class used to manage the new player registration</summary>
 public class RegisterManager : MonoBehaviour
 {
     // UsernameText to get username data

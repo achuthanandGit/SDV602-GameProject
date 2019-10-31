@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+/// <summary>Class used to manage the login process of user who has already registered</summary>
 public class LoginManager : MonoBehaviour
 {
     // MessagePanel to show error/warning/info messages
@@ -18,14 +19,7 @@ public class LoginManager : MonoBehaviour
     // PasswordText to get password data
     public InputField PasswordText;
 
-       
-    /// <summary>Start is used to load the GameObjects or actions when the scene gets loaded</summary>
-    void Start()
-    {
-       // MessagePanel.SetActive(false);
-    }
-
-    
+   
     /// <summary>
     ///   Handles Login button.
     ///   If valid then navigates to GameHomeScene.

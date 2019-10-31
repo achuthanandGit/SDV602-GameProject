@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 
 namespace Assets.scripts
 {
+    /// <summary>Class used to set the data required to insert when the game is insatlled and used first</summary>
     public class SetSceneData
     {
-
+        // to define the scene required in the game
         public List<SceneData> LocalSceneList = new List<SceneData>();
 
+        /// <summary>Initializes a new instance of the <see cref="SetSceneData"/> class.</summary>
         public SetSceneData()
         {
             MakeStoryDescription();
@@ -19,6 +21,7 @@ namespace Assets.scripts
             MakeGameQuestionAndAnswers();
         }
 
+        /// <summary>Makes the story description required for the game.</summary>
         private void MakeStoryDescription()
         {
             string descriptionScene = "\t\t\t Once there lived a bunny, Jack with his parents Will and Pink in a village close to a furious jungle. In the deep jungle " +
@@ -37,6 +40,7 @@ namespace Assets.scripts
             LocalSceneList.Add(sceneObj);
         }
 
+        /// <summary>Makes the dialog scene data for the dialog delivery scene.</summary>
         private void MakeDialogScenes()
         {
             int sceneIndex = 1112;
@@ -61,6 +65,7 @@ namespace Assets.scripts
 
         }
 
+        /// <summary>Makes the game question and answers for the player interaction.</summary>
         private void MakeGameQuestionAndAnswers()
         {
             List<SceneData> scenelist = new List<SceneData> {
@@ -128,14 +133,14 @@ namespace Assets.scripts
                 },
                 new SceneData{
                     SceneId = 10,
-                    Question = "Give me food, and I will live; give me water, and I will diw. What am I?",
+                    Question = "Give me food, and I will live; give me water, and I will die. What am I?",
                     Answer = "fire",
                     Level = 3
                 },
                 new SceneData{
                     SceneId = 11,
                     Question = "Jimmy's mother had four childres, She named the first Monday. She name the second Tuesday and she name the third Wednesday. What is the name of fourth child?",
-                    Answer = "jinny",
+                    Answer = "jimmy",
                     Level = 3
                 },
                 new SceneData{

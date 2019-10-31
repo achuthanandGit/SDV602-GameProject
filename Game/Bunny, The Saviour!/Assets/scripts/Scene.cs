@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Assets.scripts
 {
+    /// <summary>Used to set the game interaction data</summary>
     public class Scene
     {
         // To define the story
@@ -24,14 +25,5 @@ namespace Assets.scripts
             Story = pStory;
         }
 
-
-        /// <summary>Initializes a new instance of the <see cref="Scene"/> class.</summary>
-        /// <param name="pQuestion">The question.</param>
-        /// <param name="pAnswer">The answer.</param>
-        public Scene(string pQuestion, string pAnswer)
-        {
-            Question = pQuestion;
-            Answer = pAnswer;
-        }
     }
 }

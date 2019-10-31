@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+/// <summary>Class used to manage the Home screen of the game where the basic outline of the game is provided and options to join a random game or to start new game.</summary>
 public class GameHomeManager : MonoBehaviour
 {
     // To set the Game story 

@@ -7,6 +7,7 @@ using UnityEngine;
 namespace Assets.scripts
 {
 
+    /// <summary>Class used as the single instance to maintain the whole game and user data for the game play.</summary>
     public static class GameModel
     {
         // used to know whether the game is running or not
