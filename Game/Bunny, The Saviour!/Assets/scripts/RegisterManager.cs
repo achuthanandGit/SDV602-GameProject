@@ -1,21 +1,22 @@
 ﻿using Assets.scripts;
+using Assets.scripts.Domains;
 using System;
-using System.Collections.Generic;
 using System.Net.Mail;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+/// <summary>Class used to manage the new player registration</summary>
 public class RegisterManager : MonoBehaviour
 {
     // UsernameText to get username data
-    public Text UsernameText;
+    public InputField UsernameText;
 
     // PasswordText to get password data
-    public Text PasswordText;
+    public InputField PasswordText;
 
     // EmailText to get email data
-    public Text EmailText;
+    public InputField EmailText;
 
     // MessagePanel to show error/warning/info messages
     public GameObject MessagePanel;
@@ -24,21 +25,19 @@ public class RegisterManager : MonoBehaviour
     public Text MessagePanelText;
 
     // RegisterSuccess is used to know whether the user register is successfull or not
-    private bool RegisterSuccess;
+    private bool IsRegisterSuccess;
 
-    /**
-     * Start is used to load the GameObjects or actions when the scene gets loaded
-     */
+
+    /// <summary>Start is used to load the GameObjects or actions when the scene gets loaded.</summary>
     void Start()
     {
-        RegisterSuccess = false; 
+        IsRegisterSuccess = false; 
         ClearAllTextField();
         MessagePanel.SetActive(false);
     }
 
-    /**
-     * ClearAllTextField is used to clear all the text fields
-     */
+
+    /// <summary>Clears all text field.</summary>
     private void ClearAllTextField()
     {
         UsernameText.text = string.Empty;
@@ -46,79 +45,90 @@ public class RegisterManager : MonoBehaviour
         EmailText.text = string.Empty;
     }
 
-    /**
-     * CloseRegisterScene is used to close the RegisterScene when Cancel button is clicked
-     */
+
+    /// <summary>Closes the register scene when clicks Cancel button.</summary>
     public void CloseRegisterScene()
     {
         ClearAllTextField();
         SceneManager.LoadScene("LoginScene");
     }
 
-    /**
-     * CloseMessagePanel is used to close the message panel when ok button is clicked
-     */
+
+    /// <summary>CloseMessagePanel is used to close the message panel when clicks OK button.</summary>
     public void CloseMessagePanel()
     {
         MessagePanel.SetActive(false);
-        if (RegisterSuccess)
+        if (IsRegisterSuccess)
             SceneManager.LoadScene("LoginScene");
     }
 
-    /**
-     * RegisterNewUserData is used to register new data
-     * If any field is empty will throw error saying so
-     * If email is not valid throw error saying so
-     * If the username is already taken throw error saying so
-     * If all data is valid, new user details will be added to GameModel and will throw info saying so
-     */
+    
+    /// <summary>
+    /// Register the new user data.
+    /// If any field is empty will throw error saying so.
+    /// If email is not valid throw error saying so
+    /// If the username is already taken throw error saying so
+    /// If all data is valid, new user details will be added to GameModel and will throw info saying so
+    /// </summary>
     public void RegisterNewUserData()
     {
         if(string.IsNullOrWhiteSpace(UsernameText.text) ||
             string.IsNullOrWhiteSpace(PasswordText.text) ||
             string.IsNullOrWhiteSpace(EmailText.text))
         {
+            Debug.Log("Error in input");
             MessagePanelText.text = "Fill all required fields.";
             MessagePanel.SetActive(true);
         } else if (!IsEmailValid(EmailText.text))
         {
+            Debug.Log("Invlid email");
             MessagePanelText.text = "Email is invalid.";
             MessagePanel.SetActive(true);
-        } else if(GameModel.UserLoginDetails.ContainsKey(UsernameText.text))
+        } else if(GameModel.CheckDuplicateUser(UsernameText.text))
         {
+            Debug.Log("Duplicate user");
             MessagePanelText.text = "Username is already taken. Please use another one.";
             MessagePanel.SetActive(true);
         } else
         {
-            Dictionary<string, string> userDataDictionary = new Dictionary<string, string>();
-            userDataDictionary.Add("password", PasswordText.text);
-            userDataDictionary.Add("email", EmailText.text);
-            userDataDictionary.Add("status", "inactive");
-            GameModel.UserLoginDetails.Add(UsernameText.text, userDataDictionary);
-            MessagePanelText.text = "User has beed added successfully";
+            Debug.Log("Setting data for save");
+            User objUser = new User();
+            objUser.Username = UsernameText.text;
+            objUser.Password = PasswordText.text;
+            objUser.Email = EmailText.text;
+            objUser.LoginStatus = "inactive";
+            if (GameModel.SaveNewUser(objUser))
+            {
+                Debug.Log("Successfull registration");
+                IsRegisterSuccess = true;
+                MessagePanelText.text = "User has beed added successfully";
+            } else
+            {
+                Debug.Log("Unsuccessfull registration");
+                MessagePanelText.text = "Unexpected error occurs. Please try again.";
+            }
+            // GameModel.UserLoginDetails.Add(UsernameText.text, objUser);
             MessagePanel.SetActive(true);
-            RegisterSuccess = true;
-        }
-
-        
+            
+        }        
     }
 
-    /**
-     * IsEmailValid is used to check whether the email id is valid or not
-     * return true if it is valid
-     * return false if it is not valid
-     * 
-     * emailaddress - emailId to check
-     */
-    private bool IsEmailValid(string emailaddress)
+
+    /// <summary>Determines whether [is email valid] [the specified emailaddress].</summary>
+    /// <param name="pEmailaddress">The emailaddress.</param>
+    /// <returns>
+    ///   <c>true</c> if [is email valid] [the specified emailaddress]; otherwise, <c>false</c>.
+    ///  </returns>
+    private bool IsEmailValid(string pEmailaddress)
     {
         try
         {
-            MailAddress m = new MailAddress(emailaddress);
+            MailAddress m = new MailAddress(pEmailaddress);
             return true;
         }
-        catch (FormatException)
+        catch (FormatException exception)
         {
+            Debug.Log("FormatException happens when checking email is valid or not: " + exception);
             return false;
         }
     }

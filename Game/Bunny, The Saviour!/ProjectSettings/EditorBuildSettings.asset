@@ -18,8 +18,11 @@ EditorBuildSettings:
     path: Assets/Scenes/GameHome.unity
     guid: b700af6d5c733db4891179fcbb5ebcd5
   - enabled: 1
-    path: Assets/Scenes/JackTinkuDialog.unity
-    guid: ff9760836f274e644a0012ff139ad458
+    path: Assets/Scenes/DialogScene.unity
+    guid: 66768dc142730dd418688207e71b2615
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
   - enabled: 1
     path: Assets/Scenes/GameRoom.unity
     guid: 0ebc7cd5ace1702498964a4d11f8b9c0

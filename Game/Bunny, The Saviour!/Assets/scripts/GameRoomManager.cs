@@ -1,4 +1,5 @@
 ﻿using Assets.scripts;
+using Assets.scripts.Domains;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,6 +17,9 @@ public class GameRoomManager : MonoBehaviour
     // Used to define the player details panel
     public GameObject PlayerDetailsPanel;
 
+    // Used to defince the Chat room
+    public GameObject ChatRoomPanel;
+
     // Used to know whether the user is trying to exit from the game
     private bool IsTryingToExit = false;
 
@@ -29,40 +33,292 @@ public class GameRoomManager : MonoBehaviour
     public InputField AnswerInputField;
 
     // To count the questions
-    private int QuestionCount = 1;
+    private int QuestionCount = 0;
 
     // To define the CancelButton
-    public Button CancelButton;
+    public GameObject CancelButton;
 
     // To define whether the answer is correct or not
-    public bool IsCorrect = false;
+    private bool IsCorrect = false;
 
-    /**
-    * Start method is used to initialize or assign values or actions to required 
-    * variable or components before the first frame update
-    */
+    // To define the initial health and updates as the game progress
+    private int PlayerHealth = 10;
+
+    // To define the player health
+    public Text PlayerHealthText;
+
+    // To track the time taken to finsish the game
+    private float StartTime;
+
+    // To define the timer for game
+    public Text GameTimerText;
+
+    // To define each game level
+    public Text LevelText;
+
+    // To define whether the game starts or not
+    private bool IsStartGame = false;
+
+    // To definde whether the game is finished or not
+    private bool IsGameFinished = false;
+
+    // To define the components in the game room other thane message/chat/payer panels
+    public GameObject GameRoomComponents;
+
+    // To define the score template container
+    public Transform ScoreTemplateContainer;
+
+    // To define Score template
+    public Transform ScoreTemplate;
+
+    // To define the score template container
+    public Transform TestContainer;
+
+    // To define Score template
+    public Transform TestTemplate;
+
+    // To define game objects to destroy
+    private List<GameObject> DestroyList = new List<GameObject>();
+
+
+    /// <summary>
+    /// Start method is used to initialize or assign values or actions to required 
+    /// variable or components before the first frame update.
+    /// </summary>
     void Start()
     {
         MessagePanel.SetActive(false);
-        CancelButton.enabled = false;
+        CancelButton.SetActive(false);
         PlayerDetailsPanel.SetActive(false);
-        SetQuestionOne();
+        GameModel.currentLevel = 1;
+        ShowGameStartDialog();
     }
 
-   
-    /**
-     * ValidateAnswer is used to validate the answer
-     */
+  
+
+    /// <summary>Updates this instance for each frame update</summary>
+    private void Update()
+    {
+        if (IsStartGame)
+            GameTimerText.text = (Time.time - StartTime).ToString("0.0");
+    }
+
+    /// <summary>Shows the first message dialog box when game starts</summary>
+    private void ShowGameStartDialog()
+    {
+        MessagePanelText.text = "By clicking OK you are ready to start the game. Complete level 1 to enter into the castle.";
+        MessagePanel.SetActive(true);
+    }
+
+    /// <summary>Handles the ok button in message panel.
+    /// If the message is 'wrong answer' or 'correct answer', Closes the message panel and loads next question.
+    /// If the messsage is about leaving the game room, then the game data will be saved and load the game home scene
+    /// </summary>
+    public void HandleOkButton()
+    {
+        CancelButton.SetActive(false);
+        MessagePanel.SetActive(false);
+      
+        if(IsGameFinished)
+        {
+            MessagePanel.SetActive(false);
+            SceneManager.LoadScene("GameHome");
+        }
+        else if (IsTryingToExit)
+        {
+            IsStartGame = false;
+            UpdateUserGameData();
+            SceneManager.LoadScene("GameHome");
+        }
+        else if (GameModel.currentLevel == 1 && QuestionCount == 0)
+            SetQuestionOne();
+        else if (IsCorrect)
+            CheckLevelAndGetNext();
+        else if (!IsCorrect)
+            ReducePlayerHealth();
+    }
+
+
+    /// <summary>Checks the level and get next scene and updates the game related player information in the database.</summary>
+    private void CheckLevelAndGetNext()
+    {
+        // checking whether the current level is completed and ready to load next level
+        if (GameModel.currentLevelTotalCount == QuestionCount)
+        {
+            // loading message to show when each level successfully completes
+            MessagePanelText.text = GetMessageForLevelPass();
+            if (UpdateGameSceneDataLists())
+            {
+                // updates the game related user informaion
+                UpdateUserGameData();
+                QuestionCount = 0;
+                MessagePanel.SetActive(true);
+                // updating UI for level
+                LevelText.text = "Level " + GameModel.currentLevel;
+                AnswerInputField.text = string.Empty;
+                IsCorrect = true;
+            }
+            else
+            {
+                // when the player finish the game successfully
+                MessagePanelText.text = "You have successfully completed all tasks and Saved the Parents. You are brave.";
+                MessagePanel.SetActive(true);
+                IsStartGame = false;
+                IsGameFinished = true;
+                // updates the game related user informaion
+                UpdateUserGameData();
+            }
+        }
+        else
+        {
+            // loading the next scene in the current level
+            SceneData sceneData = GameModel.currentLevelSceneList[QuestionCount];
+            QuestionText.text = sceneData.Question;
+            Answer = sceneData.Answer;
+            QuestionCount++;
+            // updates the game related user informaion
+            UpdateUserGameData();
+        }
+    }
+
+    /// <summary>Updates the user game data.</summary>
+    private void UpdateUserGameData()
+    {
+        // checking whether the game is running or not
+        if (!IsStartGame)
+        {
+            // Checking the current player health is better than the previous game
+            if (PlayerHealth > GameModel.CurrentUser.BestHealth)
+                GameModel.CurrentUser.BestHealth = PlayerHealth;
+            // Checking the current time took is better than the previous game
+            if (Convert.ToDouble(GameTimerText.text) > GameModel.CurrentUser.BestTime)
+                GameModel.CurrentUser.BestTime = Convert.ToDouble(GameTimerText.text);
+            // check whether the game is finishe or not
+            if(IsGameFinished)
+            {
+                // updating the user and game related user data
+                GameModel.CurrentUser.GamesWon = GameModel.CurrentUser.GamesWon + 1;
+                GameModel.UserGameData.IsWon = true;
+                GameModel.UserGameData.IsFinished = true;
+                GameModel.UserGameData.EndDateTime = DateTime.Now;
+                // updating game related data when the game is finished
+                UpdateGameData();
+            }
+        }
+        else
+        {
+            GameModel.UserGameData.IsFinished = false;
+        }
+        // Updating the game realted user data 
+        GameModel.UserGameData.Health = PlayerHealth;
+        GameModel.UserGameData.TimeTaken = Convert.ToDouble(GameTimerText.text);
+        GameModel.UserGameData.CurrentLevel = GameModel.currentLevel;
+        GameModel.UpdateUserGameData(GameModel.CurrentUser, GameModel.UserGameData);
+
+    }
+
+    /// <summary>Updates the game data when a game is finished.</summary>
+    private void UpdateGameData()
+    {
+        GameData gameData = GameModel.GetUpdatedGameData(GameModel.gameData.GameId);
+        if(gameData != null && string.IsNullOrWhiteSpace(gameData.Winner))
+        {
+            gameData.Winner = GameModel.Username;
+            gameData.BestHealth = PlayerHealth;
+            gameData.BestTime = Convert.ToDouble(GameTimerText.text);
+            gameData.GameStatus = "finished";
+            GameModel.UpdateGameData(gameData);
+        }
+    }
+
+    /// <summary>  Returns custom message to show when each level passes</summary>
+    /// <returns> success message text </returns>
+    private string GetMessageForLevelPass()
+    {
+        string successMessageText = string.Empty;
+        switch (GameModel.currentLevel)
+        {
+            case 1:
+                successMessageText = "You have successfully entered into the castle.";
+                break;
+            case 2:
+                successMessageText = "You got the secret sword to kill the monster. Now pass Level 3 to get the key for unlocking your parents.";
+                break;
+            case 3:
+                successMessageText = "You are a brave warrior. Now you need to get special energy drink to fight with monster. Go and get it.";
+                break;
+            case 4:
+                successMessageText = "You got all the elements to kill the monster and free your parents. Now pass level 5 to make sure you are capable of killing the monster";
+                break;
+            case 5:
+                successMessageText = "You saved your parents using your bravery and brightmess. You finished the game successfully.";
+                break;
+        }
+        return successMessageText;
+    }
+
+
+
+    /// <summary>Updates the game scene data lists.</summary>
+    /// <returns>
+    ///     true : If there are more levels to continue
+    ///     false : If all levels are complete
+    /// </returns>
+    private bool UpdateGameSceneDataLists()
+    {
+        GameModel.currentLevel = GameModel.currentLevel + 1;
+        if (GameModel.currentLevel > GameModel.playSceneMap.Count)
+            return false;
+        GameModel.currentLevelSceneList.Clear();
+        GameModel.currentLevelSceneList = GameModel.playSceneMap[GameModel.currentLevel];
+        GameModel.currentLevelTotalCount = GameModel.currentLevelSceneList.Count;
+        return true;
+    }
+
+    /// <summary>Exits the game.</summary>
+    public void ExitGame()
+    {
+        IsTryingToExit = true;
+        MessagePanelText.text = "Game data won't be saved. Are you sure you want to leave.";
+        CancelButton.SetActive(true);
+        MessagePanel.SetActive(true);
+    }
+
+
+    /// <summary>Handles the cancel button in message panel. Lets the user stay in the game.</summary>
+    public void HandleCancelButton()
+    {
+        IsTryingToExit = false;
+        CancelButton.SetActive(false);
+        MessagePanel.SetActive(false);
+    }
+
+    /// <summary>Sets the question one when the game room is loaded.</summary>
+    private void SetQuestionOne()
+    {
+        GameModel.currentLevelSceneList = GameModel.playSceneMap[GameModel.currentLevel];
+        GameModel.currentLevelTotalCount = GameModel.currentLevelSceneList.Count;
+        SceneData sceneData = GameModel.currentLevelSceneList[QuestionCount];
+        QuestionText.text = sceneData.Question;
+        Answer = sceneData.Answer;
+        QuestionCount++;
+        IsStartGame = true;
+        StartTime = Time.time;
+    }
+
+    /// <summary>Validates the answer.</summary>
     public void ValidateAnswer()
     {
         string messagePanelText = string.Empty;
-        if((!string.IsNullOrWhiteSpace(AnswerInputField.text)) &&
+        if ((!string.IsNullOrWhiteSpace(AnswerInputField.text)) &&
             AnswerInputField.text.ToLower() == Answer.ToLower())
         {
             MessagePanelText.text = "It's Correct.";
+            AnswerInputField.text = string.Empty;
             MessagePanel.SetActive(true);
             IsCorrect = true;
-        } else
+        }
+        else
         {
             MessagePanelText.text = "It's wrong.";
             MessagePanel.SetActive(true);
@@ -70,71 +326,76 @@ public class GameRoomManager : MonoBehaviour
         }
     }
 
-    /**
-     * SetQuestionOne is used to set the first question when the game room is loaded
-     */
-    private void SetQuestionOne()
+    /// <summary>Reduces the player health by 2 hearts when inputs wrong answer.</summary>
+    private void ReducePlayerHealth()
     {
-        QuestionText.text = GameManager.GameManagerInstance.GameModelInstance.CurrentQuestion.Question;
-        Answer = GameManager.GameManagerInstance.GameModelInstance.CurrentQuestion.Answer;
-        QuestionCount++;
-    }
-
-    /**
-     * ExitGame is used to exit from the game.
-     * As of now no game data will be saved, hence leaving game in between, later need to start from level 1
-     */
-    public void ExitGame()
-    {
-        IsTryingToExit = true;
-        MessagePanelText.text = "Game data won't be saved. Are you sure you want to leave.";
-        CancelButton.enabled = true;
-        MessagePanel.SetActive(true);
-    }
-
-    /**
-     * HandleCancelButton is used to handle the click event of cancel button in message panel,
-     * if clicked the user will stay in the program
-     */
-    public void HandleCancelButton()
-    {
-        CancelButton.enabled = false;
-        MessagePanel.SetActive(false);
-    }
-
-    /**
-     * HandleOkButton is used to handle the click event of ok button in message panel
-     */
-    public void HandleOkButton()
-    {
-        CancelButton.enabled = false;
-        MessagePanel.SetActive(false);
-        if (IsTryingToExit)
-            SceneManager.LoadScene("GameHome");
-        else if(IsCorrect)
-            GetAndShowNextQuestion();
-
-    }
-
-    /**
-     * GetAndShowNextQuestion is used to get and show next question when each question is answered correctly
-     */
-    private void GetAndShowNextQuestion()
-    {
-        AnswerInputField.text = string.Empty;
-        CommandProcessor aCommandProcessor = new CommandProcessor();
-        List<string> resultList = new List<string>();
-        switch(QuestionCount)
+        PlayerHealth = PlayerHealth - 2;
+        PlayerHealthText.text = PlayerHealth.ToString();
+        if (PlayerHealth == 0)
         {
-            case 2:
-                resultList.AddRange(aCommandProcessor.GetNext("QuestionTwo"));
-                break;
-            case 3:
-                resultList.AddRange(aCommandProcessor.GetNext("QuestionThree"));
-                break;
+            IsTryingToExit = true;
+            MessagePanelText.text = "Game Over! \n You lost all your health.";
+            MessagePanel.SetActive(true);
         }
-        QuestionText.text = resultList[0];
-        Answer = resultList[1];
-        QuestionCount++;
+        // updating game related user data
+        UpdateUserGameData();
+    }
+
+
+
+    /// <summary>Handles the game menu button. To show co-player details</summary>
+    public void HandleGameMenuButton()
+    {
+        // getting palyer list of the game currently running
+        List<UserGameData> userList = GameModel.GetGamePayerlist();
+        
+        float templateHeight = 30f;
+        int index = 0;
+        // duplicating the score template for showing each user details
+        userList.ForEach(user => {
+            Transform scoreTransform = Instantiate(ScoreTemplate, ScoreTemplateContainer);
+            RectTransform scoreRectTransform = scoreTransform.GetComponent<RectTransform>();
+            scoreRectTransform.anchoredPosition = new Vector2(0, -templateHeight * index);
+            DestroyList.Add(scoreTransform.gameObject);
+            scoreTransform.Find("NameText").GetComponent<Text>().text = userList[index].Username;
+            scoreTransform.Find("HealthText").GetComponent<Text>().text = userList[index].Health.ToString();
+            scoreTransform.Find("TimeText").GetComponent<Text>().text = userList[index].TimeTaken.ToString();
+            index = index + 1;
+        });
+        PlayerDetailsPanel.SetActive(true);
+    }
+
+
+    /// <summary>Handles the player ok button. Closes the player details panel.</summary>
+    public void HandlePlayerOkButton()
+    {
+        PlayerDetailsPanel.SetActive(false);
+        DestroyList.ForEach(gameObject => Destroy(gameObject));
+        DestroyList.Clear();
+    }
+
+
+    /// <summary>Closes the chat rooom.</summary>
+    public void CloseChatRooom()
+    {
+        ChatRoomPanel.SetActive(false);
+    }
+
+
+    /// <summary>  Will be used to update the chat room. Under development now. Will be ready for Milestone 3</summary>
+    private void ShowChatMsgs()
+    {
+        float templateHeight = 49f;
+        List<string> userList = new List<string> { "achu", "jhon", "achu", "Mike" };
+        List<string> healthList = new List<string> { "Hi Guys", "Hello Achu. Hows your game?", "Hi Jhon, It going really intersting", "Hi Guys" };
+        for (int i = 0; i < 4; i++)
+        {
+            Transform scoreTransform = Instantiate(TestTemplate, TestContainer);
+            RectTransform scoreRectTransform = scoreTransform.GetComponent<RectTransform>();
+            scoreRectTransform.anchoredPosition = new Vector2(-240, -templateHeight * (i + 1));
+            scoreTransform.Find("UsernameText").GetComponent<Text>().text = userList[i];
+            scoreTransform.Find("MessageText").GetComponent<Text>().text = healthList[i];
+            scoreTransform.Find("Splitter").GetComponent<Text>().text = "----------------------------------------------------------------------------------";
+        }
     }
 }

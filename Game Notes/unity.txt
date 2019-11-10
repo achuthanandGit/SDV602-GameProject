@@ -1,0 +1,85 @@
+Hi friends,
+
+This session is about the game development environment Unity.
+Unity is one of the most popular game development environment. One of the best example of most 
+successive game builded using Unity is PUBG. 
+I mentioned PUBG because it is even popular for children also.
+
+Let's see what basically Unity is.
+It is a cross-platform game engine developed by unity technologies.
+It was released in June 2005 at Apple Inc's Worldwide Developers Conference as a Mac OS X-Exclusive game 
+engine. Till now it extends to support more that 25 platforms. 
+It can be used to create 3D, 2D, virtual reality and augmented reality games as well as simulations.
+Apart from Video gaming, other industries such as film, automotive, architecture, engineering etc are using it.
+
+The important components/ features of unity are
+
+1. All-in-one editor
+	It provides user friendly tools for designing
+	Strong suite of developer tools for implementing logic and high performance gameplay
+2. 2D & 3D	
+	It supports both 2D and 3D as per specific needs across genres
+3. AI pathfinding tools
+	The inbuilt navigation system allows the developer to create NPCs that intelligently move around the
+	game environment.
+4. Efficient Workflows
+	Preconfigured Game objects which is called as Unity prefabs allows you create efficient and flexible 
+	workflows.
+5. User Interfaces
+	The built in User interface options helps to create the game interface fast
+6. Physics Engines
+	Inbuilt physices engines helps to create highly realistic and high performance gameplay
+7. Custom tools
+	According to the need the developer can create or add customized extensions. Lots of custimized
+	extensions are available at Unity Asset store. These helps to speed up the development time of projects
+
+
+Now we got a basic idea of What Unity is?
+Now we will look into how to install and configure the Unity.
+
+Unity can be downloaded from the official website.
+There are 4 versions of Unity is avilable.
+We need to download Free version since we are using it for educational purpose.
+While installing the Unity the user should have unity account to install.
+
+Hence it is required to create the unity account.
+
+The installation file will install Unity hub which is a software to manage installing different versios of unity
+as well as to manage the projects.
+
+Now we have successfully installed unity.
+Here I will be talking mostly on Unity2D. 
+It is almost similar for Unity3D also. Only exist some changes in the game objects and manging scenes
+
+The unity interface is mainly divided into 8 parts
+
+1. Scene view
+	It is where you construct you game. Add models, cameras and other objects required for the game.
+	While testing the game the scene will update itself current game state and we can add new elements
+	while the game is running. But, once we stop the game the scene will be reverted to its original state and 
+	will lose the elements added while game was running.
+2. Game View
+	It represents the player perspective of game. It enables the player to play the game. We can change the
+	aspect ratio of view as oer our need. This allows to test that the game is working fine in all resolutions
+	We can add custom aspect ratio by clicking the plus button at the bottom of the dropdown
+3. Hierarchy Window
+	It shows the structure of all current game objects used in the game.
+4. Project Window
+	It contains all the assets used by you game. Assets can be organized as per the developer needs.
+5. Inspector Window
+	It lets you configure any game object. When we select the game object the inspector will list all
+	the components and properties associated with that game object.
+6. Toolbar
+	Tool bar  is used to manipulate the game objects in the scene view
+7. Button area
+	It is used to start, pause and stop the game.
+8. Miscellaneous Editor Settings
+	It handle the miscellaneous aspects of the toolbar
+	collab - helps big teams collaborate on a single project seamlessly
+	Services - we can add additional unity services to the game
+	Account - It lets us to manage our unity account
+	Layers - it can be used to prevent the the rendering of GameObjects, or excluding GameObjects 
+		from physics events like collisions.
+	Layouts - It helps to create and save the layout of views in out editor and switch between them
+
+Lets see how we will put these concepts into practice.
