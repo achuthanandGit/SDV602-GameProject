@@ -1,5 +1,8 @@
 ﻿using Assets.scripts;
 using Assets.scripts.Domains;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -66,5 +69,94 @@ public class LoginManager : MonoBehaviour
     public void LoadRegisterScene()
     {
         SceneManager.LoadScene("RegisterScene");
+    }
+
+
+    // testing JSN DROP
+
+    public void jsnReceiverDel(JsnReceiver pReceived)
+    {
+        Debug.Log(pReceived.JsnMsg + " ..." + pReceived.Msg);
+        // To do: parse and produce an appropriate response
+    }
+
+    public void jsnListReceiverDel(List<User> pReceivedList)
+    {
+        Debug.Log("Received items " + pReceivedList.Count());
+        foreach (User lcReceived in pReceivedList)
+        {
+            string ss = lcReceived.Username + "," + lcReceived.Password + "," + lcReceived.BestHealth.ToString();
+            Debug.Log(ss);
+        }// for
+
+        // To do: produce an appropriate response
+    }
+
+    public void clickButton()
+    {
+        
+        JSONDropService jsDrop = new JSONDropService { Token = "da308d33-ba58-413d-9abf-b987c9eac791"};
+
+        // Create table person
+        jsDrop.Create<User, JsnReceiver>(new User
+        {
+            Username = "achu",
+            Password = "achu",
+            BestHealth = 10,
+            BestTime = 20.00,
+            Email = "achu@gmail.com",
+            LoginStatus = "active",
+            GamesWon = 1,
+            Lastlogin = DateTime.Now
+        }, jsnReceiverDel);
+
+       // jsDrop.All<User, JsnReceiver>(jsnListReceiverDel, jsnReceiverDel);
+
+        /*
+        // Store people records
+        jsDrop.Store<User, JsnReceiver>(new List<User>
+        {
+            new User{
+            Username = "achu",
+            Password = "achu",
+            BestHealth = 10,
+            BestTime = 20.00,
+            Email = "achu@gmail.com",
+            LoginStatus = "active",
+            GamesWon = 1,
+            Lastlogin = DateTime.Now
+            },
+            new User{
+            Username = "manu",
+            Password = "manu",
+            BestHealth = 10,
+            BestTime = 20.00,
+            Email = "manu@gmail.com",
+            LoginStatus = "active",
+            GamesWon = 1,
+            Lastlogin = DateTime.Now
+            },
+            new User{
+            Username = "vasu",
+            Password = "vasu",
+            BestHealth = 10,
+            BestTime = 20.00,
+            Email = "vasu@gmail.com",
+            LoginStatus = "active",
+            GamesWon = 1,
+            Lastlogin = DateTime.Now
+            },
+         }, jsnReceiverDel);
+
+        /*
+        // Retreive all people records
+        jsDrop.All<tblPerson, JsnReceiver>(jsnListReceiverDel, jsnReceiverDel);
+        
+        jsDrop.Select<tblPerson,JsnReceiver>("HighScore > 200",jsnListReceiverDel, jsnReceiverDel);
+        
+        jsDrop.Delete<tblPerson, JsnReceiver>("PersonID = 'Jonny'", jsnReceiverDel);
+        
+        jsDrop.Drop<User, JsnReceiver>(jsnReceiverDel);
+        */
     }
 }

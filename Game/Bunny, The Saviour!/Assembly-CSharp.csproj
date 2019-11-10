@@ -74,6 +74,7 @@
     <Compile Include="Assets\scripts\GameManager.cs" />
     <Compile Include="Assets\scripts\GameModel.cs" />
     <Compile Include="Assets\scripts\GameRoomManager.cs" />
+    <Compile Include="Assets\scripts\JSONDropService.cs" />
     <Compile Include="Assets\scripts\LoginManager.cs" />
     <Compile Include="Assets\scripts\RegisterManager.cs" />
     <Compile Include="Assets\scripts\Scene.cs" />
@@ -273,6 +274,9 @@
     </Reference>
     <Reference Include="nunit.framework">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2019.1.10f1/Editor/Data/UnityExtensions/Unity/TestRunner/net35/unity-custom/nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>D:/achuthanandGit/SDV602/SDV602-GameProject/Game/Bunny, The Saviour!/Assets/Plugins/Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.Editor">
       <HintPath>D:/achuthanandGit/SDV602/SDV602-GameProject/Game/Bunny, The Saviour!/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Editor.dll</HintPath>

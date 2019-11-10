@@ -13,7 +13,9 @@ using System.Collections.Generic;
 public class DataService
 {
 
-    private static SQLiteConnection _Connection;
+    public SQLiteConnection Connection;
+
+    public static SQLiteConnection _Connection;
 
     /// <summary>
     ///  Initializes a new instance of the <see cref="DataService"/> class and creates database in the application path
@@ -69,7 +71,7 @@ public class DataService
 
         var dbPath = filepath;
 #endif
-        _Connection = new SQLiteConnection(dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
+        Connection = new SQLiteConnection(dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
         Debug.Log("Final PATH: " + dbPath);
     }
 

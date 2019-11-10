@@ -52,18 +52,18 @@ namespace Assets.scripts
         {
             // creating game database if required
             Debug.Log("Creating database");
-            var dataServiceObj = new DataService("gameDB.db");
+            //var dataServiceObj = new DataService("gameDB.db");
 
             // creating game tables if required
             Debug.Log("Creating Tables");
-            dataServiceObj.CreateRequiredTables();
+            //dataServiceObj.CreateRequiredTables();
 
             // inserting base game data 
             Debug.Log("Inserting game data");
-            dataServiceObj.InsertBaseGameData();
+            //dataServiceObj.InsertBaseGameData();
 
             Debug.Log("Getting game Data");
-            MakeGameData();
+            //MakeGameData();
             // MakeGameRoomInteraction();
         }
 
