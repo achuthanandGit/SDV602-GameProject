@@ -14,7 +14,7 @@ namespace Assets.scripts.Domains
         private int _SendTime;
 
 
-        [PrimaryKey, AutoIncrement]
+        [PrimaryKey]
         public int Id { get => _Id; set => _Id = value; }
         public int GameId { get => _GameId; set => _GameId = value; }
         public string Username { get => _Username; set => _Username = value; }

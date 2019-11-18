@@ -63,6 +63,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Controller.cs" />
+    <Compile Include="Assets\scripts\AddProfilePic.cs" />
     <Compile Include="Assets\scripts\DataServices.cs" />
     <Compile Include="Assets\scripts\DialogueManager.cs" />
     <Compile Include="Assets\scripts\Domains\ChatDetails.cs" />
@@ -80,6 +82,7 @@
     <Compile Include="Assets\scripts\Scene.cs" />
     <Compile Include="Assets\scripts\SetSceneData.cs" />
     <Compile Include="Assets\scripts\SQLite.cs" />
+    <Compile Include="Assets\TestAccelerometer.cs" />
     <Reference Include="Unity.Timeline.Editor">
       <HintPath>D:/achuthanandGit/SDV602/SDV602-GameProject/Game/Bunny, The Saviour!/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
     </Reference>

@@ -32,19 +32,19 @@ namespace Assets.scripts
         public static UserGameData UserGameData;
 
         // To save current game details
-        public static GameData gameData;
+        public static GameData GameData;
 
         // To define the game scene data according to levels
-        public static IDictionary<int, List<SceneData>> playSceneMap = new Dictionary<int, List<SceneData>>();
+        public static IDictionary<int, List<SceneData>> PlaySceneMap = new Dictionary<int, List<SceneData>>();
 
         // To define the current level scene list
-        public static List<SceneData> currentLevelSceneList = new List<SceneData>();
+        public static List<SceneData> CurrentLevelSceneList = new List<SceneData>();
 
         // To define the current level
-        public static int currentLevel;
+        public static int CurrentLevel;
 
         // To define how many need to pass to complete the current level
-        public static int currentLevelTotalCount;
+        public static int CurrentLevelTotalCount;
 
 
         /// <summary>Gets the and set game data.</summary>
@@ -52,20 +52,39 @@ namespace Assets.scripts
         {
             // creating game database if required
             Debug.Log("Creating database");
-            //var dataServiceObj = new DataService("gameDB.db");
+            //var dataServiceObj = new DataService();
+            var dataServiceObj = new DataService("gameDB.db");
 
             // creating game tables if required
             Debug.Log("Creating Tables");
-            //dataServiceObj.CreateRequiredTables();
+            dataServiceObj.CreateRequiredTables();
 
             // inserting base game data 
             Debug.Log("Inserting game data");
-            //dataServiceObj.InsertBaseGameData();
+            dataServiceObj.InsertBaseGameData();
 
-            Debug.Log("Getting game Data");
-            //MakeGameData();
-            // MakeGameRoomInteraction();
+            //Debug.Log("Getting game Data");
+            MakeGameData();
         }
+
+        /// <summary>
+        /// Updates the user status.
+        /// </summary>
+        /// <param name="pUser">The p user.</param>
+        internal static void UpdateUserStatus(User pUser)
+        {
+            DataService.UpdateUserStatus(pUser);
+        }
+
+        /// <summary>
+        /// Updates the user game data.
+        /// </summary>
+        /// <param name="pGameId">The game identifier.</param>
+        internal static void UpdateUserGameData(int pGameId)
+        {
+            DataService.UpdateUserGameData(pGameId);
+        }
+
 
         /// <summary>Makes the story description for Game Home scene.</summary>
         public static void MakeGameData()
@@ -85,54 +104,50 @@ namespace Assets.scripts
                 // minimizing the GameSceneList to the data required to activate the game room
                 gameSceneList = gameSceneList.Except(DialogueList).ToList();
                 gameSceneList.Remove(GameDescData);
-                playSceneMap = gameSceneList.GroupBy(scene => scene.Level)
+                PlaySceneMap = gameSceneList.GroupBy(scene => scene.Level)
                                             .ToDictionary(scene => scene.Key, scene => scene.ToList());
             }
             else
                 Debug.Log("Failed to retrieve game data");
         }
 
-        
+        /// <summary>
+        /// Gets the list of active games.
+        /// </summary>
+        public static void GetAvailableGameList()
+        {
+            DataService.GetAvailableGameList();
+        }
+
+
 
         /// <summary>Saves the new user.</summary>
         /// <param name="pObjUser">The object user.</param>
-        /// <returns>
-        ///     true: if user data saved successfully
-        ///     false: if user data fail to save       
-        /// </returns>
-        public static bool SaveNewUser(User pObjUser)
+        public static void SaveNewUser(User pObjUser)
         {
-            return DataService.SaveNewUser(pObjUser);
+            DataService.SaveNewUser(pObjUser);
         }
 
         /// <summary>Checks the duplicate user.</summary>
         /// <param name="pUsername">The username.</param>
-        /// <returns>
-        ///    true: if username already exists
-        ///    false: if username not taken
-        /// </returns>
-        public static bool CheckDuplicateUser(string pUsername)
+        public static void CheckDuplicateUser(string pUsername)
         {
-            return DataService.CheckDuplicateUser(pUsername);
+            DataService.CheckDuplicateUser(pUsername);
         }
 
         /// <summary>Validates the username and password combination.</summary>
         /// <param name="pUsername">The username.</param>
         /// <param name="pPassword">The password.</param>
-        /// <returns>
-        ///    User: If the given values are valid
-        ///    null: if the given values are not valid
-        /// </returns>
-        public static User CheckLogin(string pUsername, string pPassword)
+        public static void CheckLogin(string pUsername, string pPassword)
         {
-            return DataService.CheckLogin(pUsername, pPassword);
+            DataService.CheckLogin(pUsername, pPassword);
         }
 
         /// <summary>Logouts the user.</summary>
-        /// <param name="pUsername">The username.</param>
-        public static void LogoutUser(string pUsername)
+        /// <param name="pUser">The User.</param>
+        public static void LogoutUser(User pUser)
         {
-            DataService.LogoutUser(pUsername);
+            DataService.LogoutUser(pUser);
         }
 
         /// <summary>Updates the user game data.</summary>
@@ -145,13 +160,9 @@ namespace Assets.scripts
 
 
         /// <summary>Retrievs the payerlist in a game.</summary>
-        /// <returns>
-        ///     List<UserGameData>: If no issues happens while getting data
-        ///     null: If any exceptions when getting data
-        /// </returns>
-        public static List<UserGameData> GetGamePayerlist()
+        public static void GetGamePayerlist()
         {
-            return DataService.GetGamePlayerList(gameData.GameId);
+            DataService.GetGamePlayerList(GameData.GameId);
         }
 
         /// <summary>Starts the new game.</summary>
@@ -160,41 +171,17 @@ namespace Assets.scripts
             // generating random gameId for the uniqueness processs
             System.Random rnd = new System.Random((int)DateTime.Now.Ticks);
             int gameId = rnd.Next();
-            gameData = DataService.StartNewGame(gameId);
+            DataService.StartNewGame(gameId);
         }
 
         /// <summary>Gets the updated game data.</summary>
         /// <param name="pGameId">The game identifier.</param>
-        /// <returns>
-        ///     GameData obj: if data retrieved successfully
-        ///     null : if error happens
-        /// </returns>
-        internal static GameData GetUpdatedGameData(int pGameId)
+        internal static void GetUpdatedGameData(int pGameId)
         {
-            return DataService.GetUpdatedGameData(pGameId);
+            DataService.GetUpdatedGameData(pGameId);
         }
         
-        /// <summary>Gets the random game to join.</summary>
-        /// <returns>
-        ///     true: If able to find random game
-        ///     false: If not able to fins random game
-        /// </returns>
-        public static bool GetRandomGameToJoin()
-        {
-            List<GameData> gameList = DataService.GetAvailableGameList();
-            if (gameList.Count == 0)
-                return false;
-            else
-            {
-                // getting random game to join from the list of active games
-                System.Random rnd = new System.Random((int)DateTime.Now.Ticks);
-                int randomIndex = rnd.Next(gameList.Count);
-                gameData = gameList[randomIndex];
-                DataService.UpdateUserGameData(gameData.GameId);
-                return true;
-            }
-        }
-
+      
         /// <summary>Updates the game data.</summary>
         /// <param name="pGameDate">The game date.</param>
         internal static void UpdateGameData(GameData pGameDate)

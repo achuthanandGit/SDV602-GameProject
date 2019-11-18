@@ -112,7 +112,7 @@ public class JSONDropService
         {
             //string result = "";
             bool isAuto = false;
-            string tblName = typeof(T).ToString();
+            String tblName = ParseTableName<T>();
             var tblType = typeof(T);
             var DB = new DataService("gameDB.db");
             TableMapping map = DB.Connection.GetMapping(tblType);
@@ -129,6 +129,7 @@ public class JSONDropService
             jsnString = ReplacePKName(jsnString, pkName, isAuto);
             jsnString = "{\"CREATE\":\"" + tblName + "\",\"EXAMPLE\":" + jsnString + "}";
 
+            Debug.Log(jsnString);
             Post<S>(jsnString, pReceiveGoesHere);
 
 
@@ -141,6 +142,19 @@ public class JSONDropService
 
         }
     }
+
+    private string ParseTableName<T>()
+    {
+        string typeName = typeof(T).ToString();
+        if (typeName.Contains('.'))
+        {
+            string[] nameList = typeName.Split('.');
+            return nameList[(nameList.Count() - 1)];
+        }
+        else
+            return typeName;
+
+    }
     #endregion
 
     #region Store records
@@ -148,7 +162,7 @@ public class JSONDropService
     {
         try
         {
-            string tblName = typeof(T).ToString();
+            string tblName = ParseTableName<T>();
             string jsnList = JsonConvert.SerializeObject(pRecords);//ListToJson<T>(pRecords);
             string jsnString = "{\"STORE\":\"" + tblName + "\",\"VALUE\":" + jsnList + "}";
             Post<S>(jsnString, pReceiveGoesHere);
@@ -166,7 +180,7 @@ public class JSONDropService
     {
         try
         {
-            string tblName = typeof(T).ToString();
+            string tblName = ParseTableName<T>();
             string jsnString = "{\"ALL\":\"" + tblName + "\"}";
             Post<T,S>(jsnString, pReceiveSuccessGoesHere,pReceiveFailGoesHere);
         }
@@ -184,7 +198,7 @@ public class JSONDropService
     {
         try
         {
-            string tblName = typeof(T).ToString();
+            string tblName = ParseTableName<T>();
             string jsnString = "{\"SELECT\":\"" + tblName + "\",\"WHERE\":\""+ pStrWhere + "\"}";
             Post<T, S>(jsnString, pReceiveSuccessGoesHere, pReceiveFailGoesHere);
         }
@@ -201,7 +215,7 @@ public class JSONDropService
     {
         try
         {
-            string tblName = typeof(T).ToString();
+            string tblName = ParseTableName<T>();
             string jsnString = "{\"DELETE\":\"" + tblName + "\",\"WHERE\":\"" + pStrWhere + "\"}";
             Post<S>(jsnString,  pReceiveGoesHere);
         }
@@ -218,7 +232,7 @@ public class JSONDropService
     {
         try
         {
-            string tblName = typeof(T).ToString();
+            string tblName = ParseTableName<T>();
             string jsnString = "{\"DROP\":\"" + tblName + "\"}";
             Post<S>(jsnString, pReceiveGoesHere);
         }
@@ -288,6 +302,9 @@ public class JSONDropService
     }
     private List<T> FromJsonArrayToList<T>(string pStrJsonAry)
     {
+        if (string.IsNullOrWhiteSpace(pStrJsonAry))
+            return new List<T>();
+
         string[] sep = { "},{" };
         string[] aryOfJSON = (pStrJsonAry.Substring(1, pStrJsonAry.Length - 2)).Split(sep, StringSplitOptions.RemoveEmptyEntries);
         List<string> lstOfJSONClean = new List<string>(); ;
@@ -375,6 +392,7 @@ public class JSONDropService
             
         });
     }
+
 
     private   void Post<S>(string pJsn, ReceiveRecordDelegate<S> pReceiveGoesHere)
     {

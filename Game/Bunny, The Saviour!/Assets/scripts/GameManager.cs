@@ -23,7 +23,6 @@ public class GameManager : MonoBehaviour
             Debug.Log("Initiating the GameManager");
             GameManagerInstance = this;
             // Creating local database if not exists
-            Debug.Log("Creating Database");
             // setting all the game realted data for the first time
             GameModel.GetAndSetGameData();
         }

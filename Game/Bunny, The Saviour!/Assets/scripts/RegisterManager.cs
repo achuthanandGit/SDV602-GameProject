@@ -1,6 +1,9 @@
 ﻿using Assets.scripts;
 using Assets.scripts.Domains;
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Net.Mail;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -10,29 +13,42 @@ using UnityEngine.UI;
 public class RegisterManager : MonoBehaviour
 {
     // UsernameText to get username data
-    public InputField UsernameText;
+    public static InputField UsernameText;
 
     // PasswordText to get password data
-    public InputField PasswordText;
+    public static InputField PasswordText;
 
     // EmailText to get email data
-    public InputField EmailText;
+    public static InputField EmailText;
 
     // MessagePanel to show error/warning/info messages
-    public GameObject MessagePanel;
+    public static GameObject MessagePanel;
 
     // MessagePanelText to set the error/warning/info messages in MessagePanel
-    public Text MessagePanelText;
+    public static Text MessagePanelText;
 
     // RegisterSuccess is used to know whether the user register is successfull or not
-    private bool IsRegisterSuccess;
+    private static bool IsRegisterSuccess;
 
 
     /// <summary>Start is used to load the GameObjects or actions when the scene gets loaded.</summary>
     void Start()
     {
-        IsRegisterSuccess = false; 
+        IsRegisterSuccess = false;
+        GetAllComponents();
         ClearAllTextField();
+    }
+
+    /// <summary>
+    /// Gets all components required for the register process.
+    /// </summary>
+    private void GetAllComponents()
+    {
+        UsernameText = GameObject.Find("UsernameInput").GetComponent<InputField>();
+        PasswordText = GameObject.Find("PasswordInput").GetComponent<InputField>();
+        EmailText = GameObject.Find("EmailInput").GetComponent<InputField>();
+        MessagePanel = GameObject.Find("GameMessagePanel");
+        MessagePanelText = MessagePanel.GetComponentInChildren<Text>();
         MessagePanel.SetActive(false);
     }
 
@@ -84,35 +100,91 @@ public class RegisterManager : MonoBehaviour
             Debug.Log("Invlid email");
             MessagePanelText.text = "Email is invalid.";
             MessagePanel.SetActive(true);
-        } else if(GameModel.CheckDuplicateUser(UsernameText.text))
-        {
-            Debug.Log("Duplicate user");
-            MessagePanelText.text = "Username is already taken. Please use another one.";
-            MessagePanel.SetActive(true);
         } else
         {
-            Debug.Log("Setting data for save");
-            User objUser = new User();
-            objUser.Username = UsernameText.text;
-            objUser.Password = PasswordText.text;
-            objUser.Email = EmailText.text;
-            objUser.LoginStatus = "inactive";
-            if (GameModel.SaveNewUser(objUser))
-            {
-                Debug.Log("Successfull registration");
-                IsRegisterSuccess = true;
-                MessagePanelText.text = "User has beed added successfully";
-            } else
-            {
-                Debug.Log("Unsuccessfull registration");
-                MessagePanelText.text = "Unexpected error occurs. Please try again.";
-            }
-            // GameModel.UserLoginDetails.Add(UsernameText.text, objUser);
-            MessagePanel.SetActive(true);
-            
-        }        
+            GameModel.CheckDuplicateUser(UsernameText.text);
+        }
+                
+    }
+    public static void CheckDuplicateRecieverDel(List<User> pReceivedList)
+    {
+        Debug.Log("Duplicate user exists");
+        MessagePanelText.text = "Username is already taken. Please use another one.";
+        MessagePanel.SetActive(true);
     }
 
+    public static void CheckDuplicateErrorDel(JsnReceiver pReceived)
+    {
+        Debug.Log("Setting data for save");
+        User objUser = new User();
+        objUser.Username = UsernameText.text;
+        objUser.Password = PasswordText.text;
+        objUser.Email = EmailText.text;
+        objUser.LoginStatus = "inactive";
+        // Saving new user
+        GameModel.SaveNewUser(objUser);
+
+        if(AddProfilePic.PictureDetailsBytes.Count() > 0)
+        {
+            #region Get FIle Path
+
+
+#if UNITY_EDITOR
+            var path = string.Format(@"Assets/StreamingAssets/{0}", UsernameText.text);
+#else
+        // check if file exists in Application.persistentDataPath
+        var filepath = string.Format("{0}/{1}", Application.persistentDataPath, UsernameText.text);
+
+        if (!File.Exists(filepath))
+        {
+           
+#if UNITY_ANDROID
+            var loadPic= new WWW("jar:file://" + Application.dataPath + "!/assets/" + UsernameText.text);  // this is the path to your StreamingAssets in android
+            while (!loadPic.isDone) { }  // CAREFUL here, for safety reasons you shouldn't let this while loop unattended, place a timer and error check
+            // then save to Application.persistentDataPath
+            File.WriteAllBytes(filepath, loadPic.bytes);
+#elif UNITY_IOS
+                 var loadPic = Application.dataPath + "/Raw/" + UsernameText.text;  // this is the path to your StreamingAssets in iOS
+                // then save to Application.persistentDataPath
+                File.Copy(loadPic, filepath);
+#elif UNITY_WP8
+                var loadPic = Application.dataPath + "/StreamingAssets/" + UsernameText.text;  // this is the path to your StreamingAssets in iOS
+                // then save to Application.persistentDataPath
+                File.Copy(loadPic, filepath);
+
+#elif UNITY_WINRT
+		var loadPic = Application.dataPath + "/StreamingAssets/" + UsernameText.text;  // this is the path to your StreamingAssets in iOS
+		// then save to Application.persistentDataPath
+		File.Copy(loadPic, filepath);
+		
+#elif UNITY_STANDALONE_OSX
+		var loadPic = Application.dataPath + "/Resources/Data/StreamingAssets/" + UsernameText.text;  // this is the path to your StreamingAssets in iOS
+		// then save to Application.persistentDataPath
+		File.Copy(loadPic, filepath);
+#else
+	var loadPic = Application.dataPath + "/StreamingAssets/" + UsernameText.text;  // this is the path to your StreamingAssets in iOS
+	// then save to Application.persistentDataPath
+	File.Copy(loadPic, filepath);
+
+#endif
+
+            Debug.Log("Database written");
+        }
+
+        var path = filepath;
+#endif
+            #endregion
+
+            Debug.Log(path);
+            // Saving profile picture in name of username. The picture will be saved locally
+            File.WriteAllBytes(path+".png", AddProfilePic.PictureDetailsBytes);
+        }
+
+        Debug.Log("Successfull registration");
+        IsRegisterSuccess = true;
+        MessagePanelText.text = "User has beed added successfully";
+        MessagePanel.SetActive(true);
+    }
 
     /// <summary>Determines whether [is email valid] [the specified emailaddress].</summary>
     /// <param name="pEmailaddress">The emailaddress.</param>

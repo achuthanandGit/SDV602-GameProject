@@ -9,13 +9,13 @@ using UnityEngine.UI;
 public class GameRoomManager : MonoBehaviour
 {
     // Used to define Message panel which will be used to show messages
-    public GameObject MessagePanel;
+    public static GameObject MessagePanel;
 
     // Used to set the message inside Message panel
-    public Text MessagePanelText;
+    public static Text MessagePanelText;
 
     // Used to define the player details panel
-    public GameObject PlayerDetailsPanel;
+    public static GameObject PlayerDetailsPanel;
 
     // Used to defince the Chat room
     public GameObject ChatRoomPanel;
@@ -42,7 +42,7 @@ public class GameRoomManager : MonoBehaviour
     private bool IsCorrect = false;
 
     // To define the initial health and updates as the game progress
-    private int PlayerHealth = 10;
+    private static int PlayerHealth = 10;
 
     // To define the player health
     public Text PlayerHealthText;
@@ -51,7 +51,7 @@ public class GameRoomManager : MonoBehaviour
     private float StartTime;
 
     // To define the timer for game
-    public Text GameTimerText;
+    public static Text GameTimerText;
 
     // To define each game level
     public Text LevelText;
@@ -62,23 +62,22 @@ public class GameRoomManager : MonoBehaviour
     // To definde whether the game is finished or not
     private bool IsGameFinished = false;
 
-    // To define the components in the game room other thane message/chat/payer panels
-    public GameObject GameRoomComponents;
 
     // To define the score template container
-    public Transform ScoreTemplateContainer;
+    public static Transform ScoreTemplateContainer;
 
     // To define Score template
-    public Transform ScoreTemplate;
+    public static Transform ScoreTemplate;
 
     // To define the score template container
-    public Transform TestContainer;
+    public static Transform MessageContainer;
 
     // To define Score template
-    public Transform TestTemplate;
+    public static Transform MessageTemplate;
 
     // To define game objects to destroy
-    private List<GameObject> DestroyList = new List<GameObject>();
+    private static List<GameObject> DestroyList = new List<GameObject>();
+    
 
 
     /// <summary>
@@ -87,20 +86,68 @@ public class GameRoomManager : MonoBehaviour
     /// </summary>
     void Start()
     {
+        GetAllComponents();
         MessagePanel.SetActive(false);
         CancelButton.SetActive(false);
         PlayerDetailsPanel.SetActive(false);
-        GameModel.currentLevel = 1;
+        GameModel.CurrentLevel = 1;
         ShowGameStartDialog();
     }
 
-  
+    /// <summary>
+    /// Gets all components.
+    /// </summary>
+    private void GetAllComponents()
+    {
+        GameTimerText = GameObject.Find("GameTimerText").GetComponent<Text>();
+        ChatRoomPanel = GameObject.Find("GameChatRoomPanel");
+        MessageContainer = GameObject.Find("MessageContainer").GetComponent<Transform>();
+        MessageTemplate = GameObject.Find("MesssageTemplate").GetComponent<Transform>();
+        ChatRoomPanel.SetActive(false);
+        MessagePanel = GameObject.Find("GameMessagePanel");
+        MessagePanelText = MessagePanel.GetComponentInChildren<Text>();
+        MessagePanel.SetActive(false);
+        PlayerDetailsPanel = GameObject.Find("PlayerDetailsPanel");
+        ScoreTemplateContainer = GameObject.Find("ScoreTemplateContainer").GetComponent<Transform>();
+        ScoreTemplate = GameObject.Find("ScoreTemplate").GetComponent<Transform>();
+        PlayerDetailsPanel.SetActive(false);
+    }
+
 
     /// <summary>Updates this instance for each frame update</summary>
     private void Update()
     {
+        CheckTiltForAnsweringDirections();
         if (IsStartGame)
             GameTimerText.text = (Time.time - StartTime).ToString("0.0");
+    }
+
+    /// <summary>
+    /// Checks the tilt for answering directions.
+    /// </summary>
+    private void CheckTiltForAnsweringDirections()
+    {
+        if(GameModel.CurrentLevel == 2)
+        {
+            float xdeg = Input.acceleration.x;
+            float ydeg = Input.acceleration.y;
+            if (xdeg > 0.5)
+            {
+                AnswerInputField.text = "east";
+            }
+            else if (xdeg < -0.5)
+            {
+                AnswerInputField.text = "west";
+            }
+            else if (ydeg > 0.5)
+            {
+                AnswerInputField.text = "north";
+            }
+            else if (ydeg < -0.5)
+            {
+                AnswerInputField.text = "south";
+            }
+        }
     }
 
     /// <summary>Shows the first message dialog box when game starts</summary>
@@ -118,8 +165,8 @@ public class GameRoomManager : MonoBehaviour
     {
         CancelButton.SetActive(false);
         MessagePanel.SetActive(false);
-      
-        if(IsGameFinished)
+
+        if (IsGameFinished)
         {
             MessagePanel.SetActive(false);
             SceneManager.LoadScene("GameHome");
@@ -130,7 +177,7 @@ public class GameRoomManager : MonoBehaviour
             UpdateUserGameData();
             SceneManager.LoadScene("GameHome");
         }
-        else if (GameModel.currentLevel == 1 && QuestionCount == 0)
+        else if (GameModel.CurrentLevel == 1 && QuestionCount == 0)
             SetQuestionOne();
         else if (IsCorrect)
             CheckLevelAndGetNext();
@@ -143,10 +190,11 @@ public class GameRoomManager : MonoBehaviour
     private void CheckLevelAndGetNext()
     {
         // checking whether the current level is completed and ready to load next level
-        if (GameModel.currentLevelTotalCount == QuestionCount)
+        if (GameModel.CurrentLevelTotalCount == QuestionCount)
         {
             // loading message to show when each level successfully completes
             MessagePanelText.text = GetMessageForLevelPass();
+            // Checks whether the user passes current level
             if (UpdateGameSceneDataLists())
             {
                 // updates the game related user informaion
@@ -154,7 +202,7 @@ public class GameRoomManager : MonoBehaviour
                 QuestionCount = 0;
                 MessagePanel.SetActive(true);
                 // updating UI for level
-                LevelText.text = "Level " + GameModel.currentLevel;
+                LevelText.text = "Level " + GameModel.CurrentLevel;
                 AnswerInputField.text = string.Empty;
                 IsCorrect = true;
             }
@@ -172,7 +220,7 @@ public class GameRoomManager : MonoBehaviour
         else
         {
             // loading the next scene in the current level
-            SceneData sceneData = GameModel.currentLevelSceneList[QuestionCount];
+            SceneData sceneData = GameModel.CurrentLevelSceneList[QuestionCount];
             QuestionText.text = sceneData.Question;
             Answer = sceneData.Answer;
             QuestionCount++;
@@ -194,25 +242,24 @@ public class GameRoomManager : MonoBehaviour
             if (Convert.ToDouble(GameTimerText.text) > GameModel.CurrentUser.BestTime)
                 GameModel.CurrentUser.BestTime = Convert.ToDouble(GameTimerText.text);
             // check whether the game is finishe or not
-            if(IsGameFinished)
+            if (IsGameFinished)
             {
                 // updating the user and game related user data
                 GameModel.CurrentUser.GamesWon = GameModel.CurrentUser.GamesWon + 1;
-                GameModel.UserGameData.IsWon = true;
-                GameModel.UserGameData.IsFinished = true;
-                GameModel.UserGameData.EndDateTime = DateTime.Now;
+                GameModel.UserGameData.IsWon = 1;
+                GameModel.UserGameData.IsFinished = 1;
                 // updating game related data when the game is finished
                 UpdateGameData();
             }
         }
         else
         {
-            GameModel.UserGameData.IsFinished = false;
+            GameModel.UserGameData.IsFinished = 1;
         }
         // Updating the game realted user data 
         GameModel.UserGameData.Health = PlayerHealth;
         GameModel.UserGameData.TimeTaken = Convert.ToDouble(GameTimerText.text);
-        GameModel.UserGameData.CurrentLevel = GameModel.currentLevel;
+        GameModel.UserGameData.CurrentLevel = GameModel.CurrentLevel;
         GameModel.UpdateUserGameData(GameModel.CurrentUser, GameModel.UserGameData);
 
     }
@@ -220,8 +267,17 @@ public class GameRoomManager : MonoBehaviour
     /// <summary>Updates the game data when a game is finished.</summary>
     private void UpdateGameData()
     {
-        GameData gameData = GameModel.GetUpdatedGameData(GameModel.gameData.GameId);
-        if(gameData != null && string.IsNullOrWhiteSpace(gameData.Winner))
+        GameModel.GetUpdatedGameData(GameModel.GameData.GameId);
+    }
+
+    /// <summary>
+    /// Rcieved game object will be updated when a user finish the game
+    /// </summary>
+    /// <param name="pGameDataList">The Game Data List.</param>
+    public static void JsnUpdateGameDataSuccessReciverDel(List<GameData> pGameDataList)
+    {
+        GameData gameData = pGameDataList[0];
+        if (string.IsNullOrWhiteSpace(gameData.Winner))
         {
             gameData.Winner = GameModel.Username;
             gameData.BestHealth = PlayerHealth;
@@ -236,7 +292,7 @@ public class GameRoomManager : MonoBehaviour
     private string GetMessageForLevelPass()
     {
         string successMessageText = string.Empty;
-        switch (GameModel.currentLevel)
+        switch (GameModel.CurrentLevel)
         {
             case 1:
                 successMessageText = "You have successfully entered into the castle.";
@@ -266,12 +322,12 @@ public class GameRoomManager : MonoBehaviour
     /// </returns>
     private bool UpdateGameSceneDataLists()
     {
-        GameModel.currentLevel = GameModel.currentLevel + 1;
-        if (GameModel.currentLevel > GameModel.playSceneMap.Count)
+        GameModel.CurrentLevel = GameModel.CurrentLevel + 1;
+        if (GameModel.CurrentLevel > GameModel.PlaySceneMap.Count)
             return false;
-        GameModel.currentLevelSceneList.Clear();
-        GameModel.currentLevelSceneList = GameModel.playSceneMap[GameModel.currentLevel];
-        GameModel.currentLevelTotalCount = GameModel.currentLevelSceneList.Count;
+        GameModel.CurrentLevelSceneList.Clear();
+        GameModel.CurrentLevelSceneList = GameModel.PlaySceneMap[GameModel.CurrentLevel];
+        GameModel.CurrentLevelTotalCount = GameModel.CurrentLevelSceneList.Count;
         return true;
     }
 
@@ -296,9 +352,9 @@ public class GameRoomManager : MonoBehaviour
     /// <summary>Sets the question one when the game room is loaded.</summary>
     private void SetQuestionOne()
     {
-        GameModel.currentLevelSceneList = GameModel.playSceneMap[GameModel.currentLevel];
-        GameModel.currentLevelTotalCount = GameModel.currentLevelSceneList.Count;
-        SceneData sceneData = GameModel.currentLevelSceneList[QuestionCount];
+        GameModel.CurrentLevelSceneList = GameModel.PlaySceneMap[GameModel.CurrentLevel];
+        GameModel.CurrentLevelTotalCount = GameModel.CurrentLevelSceneList.Count;
+        SceneData sceneData = GameModel.CurrentLevelSceneList[QuestionCount];
         QuestionText.text = sceneData.Question;
         Answer = sceneData.Answer;
         QuestionCount++;
@@ -347,19 +403,26 @@ public class GameRoomManager : MonoBehaviour
     public void HandleGameMenuButton()
     {
         // getting palyer list of the game currently running
-        List<UserGameData> userList = GameModel.GetGamePayerlist();
-        
+        GameModel.GetGamePayerlist();
+    }
+    
+    /// <summary>
+    /// This will display the score list of current game
+    /// </summary>
+    /// <param name="pUserList">The p user game list.</param>
+    public static void JsnUserListSuccessRecieverDel(List<UserGameData> pUserGameList)
+    {
         float templateHeight = 30f;
         int index = 0;
         // duplicating the score template for showing each user details
-        userList.ForEach(user => {
+        pUserGameList.ForEach(user => {
             Transform scoreTransform = Instantiate(ScoreTemplate, ScoreTemplateContainer);
             RectTransform scoreRectTransform = scoreTransform.GetComponent<RectTransform>();
             scoreRectTransform.anchoredPosition = new Vector2(0, -templateHeight * index);
             DestroyList.Add(scoreTransform.gameObject);
-            scoreTransform.Find("NameText").GetComponent<Text>().text = userList[index].Username;
-            scoreTransform.Find("HealthText").GetComponent<Text>().text = userList[index].Health.ToString();
-            scoreTransform.Find("TimeText").GetComponent<Text>().text = userList[index].TimeTaken.ToString();
+            scoreTransform.Find("NameText").GetComponent<Text>().text = pUserGameList[index].Username;
+            scoreTransform.Find("HealthText").GetComponent<Text>().text = pUserGameList[index].Health.ToString();
+            scoreTransform.Find("TimeText").GetComponent<Text>().text = pUserGameList[index].TimeTaken.ToString();
             index = index + 1;
         });
         PlayerDetailsPanel.SetActive(true);
@@ -383,14 +446,15 @@ public class GameRoomManager : MonoBehaviour
 
 
     /// <summary>  Will be used to update the chat room. Under development now. Will be ready for Milestone 3</summary>
-    private void ShowChatMsgs()
+    public void ShowChatMsgs()
     {
+        ChatRoomPanel.SetActive(true);
         float templateHeight = 49f;
         List<string> userList = new List<string> { "achu", "jhon", "achu", "Mike" };
         List<string> healthList = new List<string> { "Hi Guys", "Hello Achu. Hows your game?", "Hi Jhon, It going really intersting", "Hi Guys" };
         for (int i = 0; i < 4; i++)
         {
-            Transform scoreTransform = Instantiate(TestTemplate, TestContainer);
+            Transform scoreTransform = Instantiate(MessageTemplate, MessageContainer);
             RectTransform scoreRectTransform = scoreTransform.GetComponent<RectTransform>();
             scoreRectTransform.anchoredPosition = new Vector2(-240, -templateHeight * (i + 1));
             scoreTransform.Find("UsernameText").GetComponent<Text>().text = userList[i];

@@ -14,7 +14,7 @@ namespace Assets.scripts.Domains
         private int _GamesWon;
         private int _BestHealth;
         private double _BestTime;
-        private DateTime _Lastlogin;
+        private string _Lastlogin;
 
         [PrimaryKey]
         public string Username { get => _Username; set => _Username = value; }
@@ -24,7 +24,7 @@ namespace Assets.scripts.Domains
         public int GamesWon { get => _GamesWon; set => _GamesWon = value; }
         public int BestHealth { get => _BestHealth; set => _BestHealth = value; }
         public double BestTime { get => _BestTime; set => _BestTime = value; }
-        public DateTime Lastlogin { get => _Lastlogin; set => _Lastlogin = value; }
+        public string Lastlogin { get => _Lastlogin; set => _Lastlogin = value; }
         
     }
 }

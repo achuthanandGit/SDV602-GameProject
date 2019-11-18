@@ -17,12 +17,17 @@ public class DataService
 
     public static SQLiteConnection _Connection;
 
+    public static JSONDropService _JsnDrop;
+
+   
+    #region SQLite database path
     /// <summary>
     ///  Initializes a new instance of the <see cref="DataService"/> class and creates database in the application path
     /// </summary>
     /// <param name="pDatabaseName">Name of the database.</param>
     public DataService(string pDatabaseName)
     {
+       
 
 #if UNITY_EDITOR
         var dbPath = string.Format(@"Assets/StreamingAssets/{0}", pDatabaseName);
@@ -71,19 +76,27 @@ public class DataService
 
         var dbPath = filepath;
 #endif
-        Connection = new SQLiteConnection(dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
+        _Connection = new SQLiteConnection(dbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create);
+        _JsnDrop = new JSONDropService { Token = "da308d33-ba58-413d-9abf-b987c9eac791" };
+
         Debug.Log("Final PATH: " + dbPath);
     }
 
+    #endregion
+
+    public static void JsnReceiverDel(JsnReceiver pReceived)
+    {
+        Debug.Log(pReceived.JsnMsg + " ..." + pReceived.Msg);
+    }
 
     /// <summary>Creates the required tables for the game to run and maintain successfully.</summary>
     public void CreateRequiredTables()
     {
-        _Connection.CreateTable<User>();
-        _Connection.CreateTable<GameData>();
-        _Connection.CreateTable<UserGameData>();
+        //_Connection.CreateTable<User>();
+        //_Connection.CreateTable<GameData>();
+        //_Connection.CreateTable<UserGameData>();
         _Connection.CreateTable<SceneData>();
-        _Connection.CreateTable<ChatDetails>();
+        //_Connection.CreateTable<ChatDetails>();
         Debug.Log("tables created for the game");
     }
 
@@ -137,138 +150,101 @@ public class DataService
 
     /// <summary>Saves the new user.</summary>
     /// <param name="pObjUser">The object user.</param>
-    /// <returns>
-    ///     true: if user data saved successfully
-    ///     false: if user data fail to save or occurs SQLiteException
-    /// </returns>
     /// <exception cref="SQLiteException">
     ///     If any error happens while saving data in database
     /// </exception>
-    public static bool SaveNewUser(User pObjUser)
+    public static void SaveNewUser(User pObjUser)
     {
         try
         {
-            _Connection.Insert(pObjUser);
-            return true;
+            _JsnDrop.Store<User,JsnReceiver>(new List<User> { pObjUser }, JsnReceiverDel);
         }
         catch (SQLiteException exception)
         {
             Debug.Log("SQLiteException occurs when saving new user: " + exception);
-            return false;
         }
     }
 
     /// <summary>Checks the duplicate user.</summary>
     /// <param name="pUsername">The username.</param>
-    /// <returns>
-    ///     true: if username is already taken or occurs SQLiteException
-    ///     false: if username is available
-    /// </returns>
-    /// <exception cref="SQLiteException">
+    /// <exception cref="Exception">
     ///     If any error happens while checking duplicate data
     /// </exception>
-    internal static bool CheckDuplicateUser(string pUsername)
+    internal static void CheckDuplicateUser(string pUsername)
     {
         try
         {
-            List<User> userDetailList = _Connection.Table<User>().ToList();
-            if (userDetailList.Count == 0)
-                return false;
-            else
-                return (userDetailList.Where(x => x.Username == pUsername).ToList().Count != 0);
+            string whereCondition = "Username='" + pUsername + "'";
+            _JsnDrop.Select<User, JsnReceiver>(whereCondition, RegisterManager.CheckDuplicateRecieverDel, RegisterManager.CheckDuplicateErrorDel);
         }
-        catch (SQLiteException exception)
+        catch (Exception exception)
         {
-            Debug.Log("SQLiteException occurs when checking username is already taken or not: " + exception);
-            return true;
+            Debug.Log("Exception occurs when checking username is already taken or not: " + exception);
         }
     }
 
     /// <summary>Validates the username and password combination.</summary>
     /// <param name="pUsername">The username.</param>
     /// <param name="pPassword">The password.</param>
-    /// <returns>
-    ///    User: If the given values are valid
-    ///    null: if the given values are not valid
-    /// </returns>
-    /// <exception cref="SQLiteException">
+    /// <exception cref="Exception">
     ///     If any error happens while checking login credentials
     /// </exception>
-    public static User CheckLogin(string pUsername, string pPassword)
+    public static void CheckLogin(string pUsername, string pPassword)
     {
         try
         {
-            List<User> userDetailList = _Connection.Table<User>().ToList();
-            if (userDetailList.Count() != 0 && userDetailList.Where(x => x.Username == pUsername && x.Password == pPassword).ToList().Count != 0)
-            {
-                User currentUser = userDetailList.Where(x => x.Username == pUsername && x.Password == pPassword).ToList().FirstOrDefault();
-                UpdateUserStatus(pUsername, pPassword);
-                return currentUser;
-            }
-            else
-                return null;
-        }
-        catch (SQLiteException exception)
+            
+            string whereCondition = "Username='" + pUsername + "' and Password='" + pPassword + "'";
+            _JsnDrop.Select<User, JsnReceiver>(whereCondition, LoginManager.JsnUserListReceiverDel, LoginManager.JsnUserListErrorDel);
+
+        } catch (Exception exception)
         {
-            Debug.Log("SQLiteException occurs when checking login credentials: " + exception);
-            return null;
+            Debug.Log("Exception occurs when checking login credentials: " + exception);
         }
     }
- 
 
-    /// <summary>Updates the login status.</summary>
-    /// <param name="pUsername">The username.</param>
-    /// <param name="pPassword">The password.</param>
-    /// <exception cref="SQLiteException">
+    /// <summary>
+    /// Updates the user status and last login time when the user successfully logins
+    /// </summary>
+    /// <param name="pUser">The User</param>
+    /// <exception cref="Exception">
     ///     If any error happens while updating login status
     /// </exception>
-    public static void UpdateUserStatus(string pUsername, string pPassword )
+    internal static void UpdateUserStatus(User pUser)
     {
-        try
+       try
         {
-            User loginUserObj = _Connection.Table<User>().Where(x => x.Username == pUsername && x.Password == pPassword).ToList().FirstOrDefault();
-            loginUserObj.LoginStatus = "active";
-            loginUserObj.Lastlogin = DateTime.Now;
-            GameModel.CurrentUser = loginUserObj;
-            _Connection.Update(loginUserObj);
-        }
-        catch (SQLiteException exception)
+            _JsnDrop.Store<User, JsnReceiver>(new List<User> { pUser }, JsnReceiverDel);
+        } catch (Exception exception)
         {
-            Debug.Log("SQLiteException occurs when updating login status: " + exception);
+            Debug.Log("Exception occurs when updating user status and last login time: " + exception);
         }
     }
 
     /// <summary>Updates the login status.</summary>
-    /// <param name="pUsername">The username.</param>
-    /// <exception cref="SQLiteException">
+    /// <param name="pUser">The User.</param>
+    /// <exception cref="Exception">
     ///     If any error happens while updating login status
     /// </exception>
-    public static void LogoutUser(string pUsername)
+    public static void LogoutUser(User pUser)
     {
         try
         {
-            User loginUserObj = _Connection.Table<User>().Where(x => x.Username == pUsername).FirstOrDefault();
-            loginUserObj.LoginStatus = "inactive";
-            _Connection.Update(loginUserObj);
-            GameModel.CurrentUser = null;
-            GameModel.gameData = null;
+            string whereCondition = "Username='" + pUser.Username + "' and Password='" + pUser.Password + "'";
+            _JsnDrop.Select<User, JsnReceiver>(whereCondition, GameHomeManager.JsnLogoutRecieverDel, JsnReceiverDel);
         }
-        catch (SQLiteException exception)
+        catch (Exception exception)
         {
-            Debug.Log("SQLiteException occurs when updating login status: " + exception);
+            Debug.Log("Exception occurs when updating login status: " + exception);
         }
     }
 
     /// <summary>Starts the new game.</summary>
     /// <param name="pGameId">The game Id.</param>
-    /// <returns>
-    ///    GameData: If the game is created successfully
-    ///    null: if fails to create new game
-    /// </returns>
-    /// <exception cref="SQLiteException">
+    /// <exception cref="Exception">
     ///     If any error happens while creating new game
     /// </exception>
-    internal static GameData StartNewGame(int pGameId)
+    internal static void StartNewGame(int pGameId)
     {
         try
         {
@@ -276,16 +252,14 @@ public class DataService
             gameData.GameId = pGameId;
             gameData.BestHealth = 0;
             gameData.BestTime = 0;
-            gameData.CreateDateTime = DateTime.Now;
+            gameData.CreateDateTime = DateTime.Now.Date.ToString();
             gameData.GameStatus = "active";
             gameData.Winner = string.Empty;
-            _Connection.Insert(gameData);
-            UpdateUserGameData(pGameId);
-            return gameData;
-        } catch (SQLiteException  exception)
+            GameModel.GameData = gameData;
+            _JsnDrop.Store<GameData, JsnReceiver>(new List<GameData> { gameData }, GameHomeManager.JsnNewGameReceiverDel);
+        } catch (Exception  exception)
         {
-            Debug.Log("SQLiteException occurs when starting new game: " + exception);
-            return null;
+            Debug.Log("Exception occurs when starting new game: " + exception);
         }
     }
 
@@ -293,7 +267,7 @@ public class DataService
     ///  Updates the user game data when a user join or starts a new game.
     /// </summary>
     /// <param name="pGameId">The game Id.</param>
-    /// <exception cref="SQLiteException">
+    /// <exception cref="Exception">
     ///     If any error happens while updating user game data
     /// </exception>
     public static void UpdateUserGameData(int pGameId)
@@ -301,40 +275,36 @@ public class DataService
         try
         {
             UserGameData userGameData = new UserGameData();
+            userGameData.Id = pGameId + GameModel.Username;
             userGameData.GameId = pGameId;
             userGameData.Username = GameModel.Username;
             userGameData.Health = 10;
             userGameData.TimeTaken = 0.0;
             userGameData.CurrentLevel = 1;
-            userGameData.IsFinished = false;
-            userGameData.IsWon = false;
-            userGameData.StartDateTime = DateTime.Now;
+            userGameData.IsFinished = 0;
+            userGameData.IsWon = 0;
             GameModel.UserGameData = userGameData;
-            _Connection.Insert(userGameData);
-
-        }catch (SQLiteException exception)
+            _JsnDrop.Store<UserGameData, JsnReceiver>(new List<UserGameData> { userGameData }, GameHomeManager.JsnLoadGameReceiverDel);
+        }
+        catch (Exception exception)
         {
-            Debug.Log("SQLiteException occurs when updating user data in game: " + exception);
+            Debug.Log("Exception occurs when updating user data in game: " + exception);
         }
     }
 
     /// <summary>  Gets the available game list with active state.</summary>
-    /// <returns>
-    ///     List<GameData>: If no issues happens while getting data
-    ///     null: If any exceptions when getting data
-    /// </returns>
     /// <exception cref="SQLiteException">
     ///     If any error happens while getting game data 
     /// </exception>
-    internal static List<GameData> GetAvailableGameList()
+    internal static void GetAvailableGameList()
     {
         try
         {
-            return _Connection.Table<GameData>().Where(x => x.GameStatus == "active").ToList();
-        } catch (SQLiteException exception)
+            string whereCondition = "GameStatus='active'";
+            _JsnDrop.Select<GameData, JsnReceiver>(whereCondition, GameHomeManager.JsnRandomGameSuccessRecieverDel, GameHomeManager.JsnRandomGameFailRecieverDel);
+        } catch (Exception exception)
         {
-            Debug.Log("SQLiteException occurs when getting avaialable game list to join: " + exception);
-            return null;
+            Debug.Log("Exception occurs when getting avaialable game list to join: " + exception);
         }
     }
 
@@ -348,8 +318,8 @@ public class DataService
     {
         try
         {
-            _Connection.Update(pCurrentUser);
-            _Connection.Update(pUserGameData);
+            _JsnDrop.Store<User, JsnReceiver>(new List<User> { pCurrentUser }, JsnReceiverDel);
+            _JsnDrop.Store<UserGameData, JsnReceiver>(new List<UserGameData> { pUserGameData }, JsnReceiverDel);
         }
         catch (SQLiteException exception)
         {
@@ -359,45 +329,37 @@ public class DataService
 
     /// <summary> Retrieves the user list related to the game.</summary>
     /// <param name="pGameId">The game Id.</param>
-    /// <returns>
-    ///     List<UserGameData>: If no issues happens while getting data
-    ///     null: If any exceptions when getting data
-    /// </returns>
-    /// <exception cref="SQLiteException">
+    /// <exception cref="Exception">
     ///     If any error happens while getting game data 
     /// </exception>
-    internal static List<UserGameData> GetGamePlayerList(int pGameId)
+    public static void GetGamePlayerList(int pGameId)
     {
         try
         {
-            return _Connection.Table<UserGameData>().Where(x => x.GameId == pGameId).ToList();
+            string whereCondition = "GameId=" + pGameId;
+            _JsnDrop.Select<UserGameData, JsnReceiver>(whereCondition, GameRoomManager.JsnUserListSuccessRecieverDel, JsnReceiverDel);
         }
-        catch (SQLiteException exception)
+        catch (Exception exception)
         {
-            Debug.Log("SQLiteException occurs when getting user data in a game: " + exception);
-            return null;
+            Debug.Log("Exception occurs when getting user data in a game: " + exception);
         }
     }
 
     /// <summary>Gets the updated game data.</summary>
     /// <param name="pGameId">The game identifier.</param>
-    /// <returns>
-    ///     GameData obj: if data retrieved successfully
-    ///     null : if error happens
-    /// </returns>
-    /// <exception cref="SQLiteException">
+    /// <exception cref="Exception">
     ///     If any error happens while getting game data 
     /// </exception>
-    internal static GameData GetUpdatedGameData(int pGameId)
+    internal static void GetUpdatedGameData(int pGameId)
     {
         try
         {
-            return _Connection.Table<GameData>().Where(x => x.GameId == pGameId).FirstOrDefault();
+            string whereCondition = "GameId="+pGameId;
+            _JsnDrop.Select<GameData, JsnReceiver>(whereCondition, GameRoomManager.JsnUpdateGameDataSuccessReciverDel, JsnReceiverDel);
         }
-        catch (SQLiteException exception)
+        catch (Exception exception)
         {
-            Debug.Log("SQLiteException occurs when getting game data: " + exception);
-            return null;
+            Debug.Log("Exception occurs when getting game data: " + exception);
         }
     }
 
