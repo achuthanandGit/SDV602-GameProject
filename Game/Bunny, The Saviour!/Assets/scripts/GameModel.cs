@@ -188,5 +188,23 @@ namespace Assets.scripts
         {
             DataService.UpdateGameData(pGameDate);
         }
+
+        /// <summary>
+        /// Sends the message.
+        /// </summary>
+        /// <param name="pChatDetailsObj">The chat details object.</param>
+        internal static void SendMessage(ChatDetails pChatDetailsObj)
+        {
+            DataService.SendMessage(pChatDetailsObj);
+        }
+
+        /// <summary>
+        /// Gets the updated chat messages.
+        /// </summary>
+        internal static void GetUpdatedChatMessages()
+        {
+            DataService.GetUpdatedChatMessages();
+        }
+
     }
 }

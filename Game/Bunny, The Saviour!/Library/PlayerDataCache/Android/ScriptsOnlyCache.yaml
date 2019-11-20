@@ -1,14 +1,15 @@
 ScriptsOnlyBuild:
   usedScripts:
     Assembly-CSharp.dll:
-    - AddProfilePic
+    - Assets.scripts.AddProfilePic
     - Assets.scripts.DialogueManager
-    - Controller
-    - GameHomeManager
-    - GameManager
-    - GameRoomManager
-    - LoginManager
-    - RegisterManager
+    - Assets.scripts.GameHomeManager
+    - Assets.scripts.GameManager
+    - Assets.scripts.GameRoomManager
+    - Assets.scripts.LoginManager
+    - Assets.scripts.RegisterManager
+    UnityEditor.TestRunner.dll:
+    - UnityEditor.TestTools.TestRunner.TestListCacheData
     UnityEngine.UI.dll:
     - UnityEngine.EventSystems.EventSystem
     - UnityEngine.EventSystems.StandaloneInputModule
@@ -59,7 +60,7 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 9454}
     - Class: 114
-      Script: {instanceID: 10336}
+      Script: {instanceID: 10332}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -163,7 +164,7 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 9454}
     - Class: 114
-      Script: {instanceID: 10172}
+      Script: {instanceID: 10168}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -210,13 +211,13 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 9418}
     - Class: 114
+      Script: {instanceID: 9438}
+    - Class: 114
       Script: {instanceID: 9452}
     - Class: 114
       Script: {instanceID: 9454}
     - Class: 114
-      Script: {instanceID: 9938}
-    - Class: 114
-      Script: {instanceID: 10174}
+      Script: {instanceID: 10170}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -271,7 +272,7 @@ ScriptsOnlyBuild:
     - Class: 114
       Script: {instanceID: 9702}
     - Class: 114
-      Script: {instanceID: 10114}
+      Script: {instanceID: 10110}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -291,7 +292,7 @@ ScriptsOnlyBuild:
       serializedVersion: 2
       Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
     assemblyName: Assembly-CSharp.dll
-    namespaceName: 
+    namespaceName: Assets.scripts
     className: GameManager
   - hash:
       serializedVersion: 2
@@ -747,7 +748,7 @@ ScriptsOnlyBuild:
       serializedVersion: 2
       Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
     assemblyName: Assembly-CSharp.dll
-    namespaceName: 
+    namespaceName: Assets.scripts
     className: RegisterManager
   - hash:
       serializedVersion: 2
@@ -769,9 +770,9 @@ ScriptsOnlyBuild:
     className: ControlPlayableAsset
   - hash:
       serializedVersion: 2
-      Hash: 03b9fa76c509dfd40b86985ef0a5019a
+      Hash: c2e87f0866abbc7137b7c65b4630e25c
     assemblyName: Assembly-CSharp.dll
-    namespaceName: 
+    namespaceName: Assets.scripts
     className: GameHomeManager
   - hash:
       serializedVersion: 2
@@ -811,22 +812,10 @@ ScriptsOnlyBuild:
     className: TMP_SpriteAnimator
   - hash:
       serializedVersion: 2
-      Hash: 3f2e7ceca0addd9b3f5fccfa149562bd
-    assemblyName: Assembly-CSharp.dll
-    namespaceName: 
-    className: Controller
-  - hash:
-      serializedVersion: 2
       Hash: 4fd8bf02e3089425d3502e26c44ba31a
     assemblyName: Unity.TextMeshPro.dll
     namespaceName: TMPro
     className: TextContainer
-  - hash:
-      serializedVersion: 2
-      Hash: 8b01e2c5045ab8d64cbb6ef8ebe43ffc
-    assemblyName: Assembly-CSharp.dll
-    namespaceName: 
-    className: TestAccelerometer
   - hash:
       serializedVersion: 2
       Hash: 3f8d7b92a6be3c715e55d5cfa7cc8384
@@ -855,7 +844,7 @@ ScriptsOnlyBuild:
       serializedVersion: 2
       Hash: d897e532a8f46d59968ce4f0d97ec298
     assemblyName: Assembly-CSharp.dll
-    namespaceName: 
+    namespaceName: Assets.scripts
     className: AddProfilePic
   - hash:
       serializedVersion: 2
@@ -901,15 +890,15 @@ ScriptsOnlyBuild:
     className: TimelineAsset
   - hash:
       serializedVersion: 2
-      Hash: 016d5db43ee147949cbf84f1b929d41e
+      Hash: fee9f6fc227a7e7715f7e0445a37cc69
     assemblyName: Assembly-CSharp.dll
-    namespaceName: 
+    namespaceName: Assets.scripts
     className: GameRoomManager
   - hash:
       serializedVersion: 2
-      Hash: 55c7bc52d548eae4592e93ff02239324
+      Hash: 71bb6a6b6c8f052f948db64c7dd3ca4f
     assemblyName: Assembly-CSharp.dll
-    namespaceName: 
+    namespaceName: Assets.scripts
     className: LoginManager
   - hash:
       serializedVersion: 2

@@ -1,75 +1,96 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class AddProfilePic : MonoBehaviour
+namespace Assets.scripts
 {
-    // Button to take the picture
-    public Button TakePictureButton;
+    // AddProfilePic class is used to acceess the live camera feed and to take the picture
+    public class AddProfilePic : MonoBehaviour
+    {
+        // Button to take the picture
+        public Button TakePictureButton;
 
-    // To define the camera texture
-    WebCamTexture webCamTexture = null;
+        // To define the camera texture
+        WebCamTexture webCamTexture;
 
-    // To define picture details which then can access by RegisterManager when clicks Register button
-    public static byte[] PictureDetailsBytes;
+        // To define picture details which then can access by RegisterManager when clicks Register button
+        public static byte[] PictureDetailsBytes;
 
-    /// <summary>
-    /// Start method is used to initialize or assign values or actions to required 
-    /// variable or components before the first frame update.
-    /// </summary>
-    void Start()
-    {  
-        // getting the available devices
-        WebCamDevice[] deviceList = WebCamTexture.devices;
-        // getting front camera for taking picture
-        for (int index = 0; index < deviceList.Length; ++index)
+        // to check whether the camers is available or not
+        private bool IsCameraAvailable = false;
+
+        /// <summary>
+        /// Start method is used to initialize or assign values or actions to required 
+        /// variable or components before the first frame update.
+        /// </summary>
+        void Start()
         {
-            // checking for front camera
-            if (deviceList[index].isFrontFacing)
-            {
-                webCamTexture = new WebCamTexture(deviceList[index].name);
-            }
+            GetAndSetWebCamTexture();
         }
-        if (webCamTexture == null)
-            webCamTexture = new WebCamTexture();
-        webCamTexture.Play();
-    }
 
-    /// <summary>Updates this instance for each frame update</summary>
-    private void Update()
-    {
-        // Assigning the texture to the raw image component
-        GetComponent<RawImage>().texture = webCamTexture;
-    }
+        /// <summary>
+        /// Gets the and set web cam texture.
+        /// </summary>
+        private void GetAndSetWebCamTexture()
+        {
+            // getting the available devices
+            WebCamDevice[] deviceList = WebCamTexture.devices;
+            // getting front camera for taking picture
+            for (int index = 0; index < deviceList.Length; ++index)
+            {
+                // checking for front camera
+                if (deviceList[index].isFrontFacing)
+                {
+                    webCamTexture = new WebCamTexture(deviceList[index].name);
+                    IsCameraAvailable = true;
+                }
+            }
+            webCamTexture.Play();
+        }
 
-    public void TaskOnClick()
-    {
-        Debug.Log("Clicked the take photo button");
-        StartCoroutine(TakePhoto());
-    }
+        /// <summary>Updates this instance for each frame update</summary>
+        private void Update()
+        {
+            if (IsCameraAvailable)
+                GetComponent<RawImage>().texture = webCamTexture;
+            else
+                GetAndSetWebCamTexture();
+        }
 
-    /// <summary>
-    /// Coroutine to take and save the picture
-    /// </summary>
-    public IEnumerator TakePhoto()  // Start this Coroutine on some button click
-    {
-        Debug.Log("Starting coroutine");
+        /// <summary>
+        /// To handle the Click picture event
+        /// </summary>
+        public void TaskOnClick()
+        {
+            Debug.Log("Clicked the take photo button");
+            // Starting coroutine
+            StartCoroutine(TakePhoto());
+        }
 
-        // NOTE - you almost certainly have to do this here:
+        /// <summary>
+        /// Coroutine to take and save the picture
+        /// </summary>
+        public IEnumerator TakePhoto()  // Start this Coroutine on some button click
+        {
+            Debug.Log("Starting coroutine");
 
-         yield return new WaitForEndOfFrame();
+            // NOTE - you almost certainly have to do this here:
 
-        // it's a rare case where the Unity doco is pretty clear,
-        // http://docs.unity3d.com/ScriptReference/WaitForEndOfFrame.html
-        // be sure to scroll down to the SECOND long example on that doco page 
+            yield return new WaitForEndOfFrame();
 
-        Texture2D photo = new Texture2D(33, 31);
-        photo.SetPixels(webCamTexture.GetPixels());
-        photo.Apply();
+            // it's a rare case where the Unity doco is pretty clear,
+            // http://docs.unity3d.com/ScriptReference/WaitForEndOfFrame.html
+            // be sure to scroll down to the SECOND long example on that doco page 
 
-        //Encode to a PNG;
-        PictureDetailsBytes = photo.EncodeToPNG();
-        Debug.Log("Took picture");
+            Texture2D photo = new Texture2D(webCamTexture.width, webCamTexture.height);
+            photo.SetPixels(webCamTexture.GetPixels());
+            photo.Apply();
+
+            //Encode to a PNG;
+            PictureDetailsBytes = photo.EncodeToPNG();
+            Debug.Log("Took picture");
+        }
     }
 }

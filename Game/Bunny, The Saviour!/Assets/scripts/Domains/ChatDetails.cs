@@ -7,19 +7,19 @@ namespace Assets.scripts.Domains
     [Serializable]
     class ChatDetails
     {
-        private int _Id;
+        private string _Id;
         private int _GameId;
         private string _Username;
         private string _Message;
-        private int _SendTime;
+        private string _SendTime;
 
 
         [PrimaryKey]
-        public int Id { get => _Id; set => _Id = value; }
+        public string Id { get => _Id; set => _Id = value; }
         public int GameId { get => _GameId; set => _GameId = value; }
         public string Username { get => _Username; set => _Username = value; }
         public string Message { get => _Message; set => _Message = value; }
-        public int SendTime { get => _SendTime; set => _SendTime = value; }
+        public string SendTime { get => _SendTime; set => _SendTime = value; }
 
     }
 }
