@@ -96,8 +96,8 @@ namespace Assets.scripts
                 },
                  new SceneData{
                     SceneId = 5,
-                    Question = "After walking in south direction you reached dead end. You can see a underground door. Open it to get in.",
-                    Answer = "open",
+                    Question = "After walking in south direction you reached dead end. You can see a underground door. Turn east to open it",
+                    Answer = "east",
                     Level = 2
                 },
                  new SceneData{
@@ -120,9 +120,9 @@ namespace Assets.scripts
                 },
                  new SceneData{
                     SceneId = 8,
-                    Question = "Follwing the direction of stream towards west. You reached infornt of a small cave. You went inside and found 2 boxes, one with full of diamonds and other one have a big sharp sword. Choose wisely. \n " +
-                    "'Diamond or Sword' ",
-                    Answer = "sword",
+                    Question = "Follwing the direction of stream towards west. You reached infornt of a small cave. You went inside and found 2 boxes, one with full of diamonds in north side and other one have a big sharp sword in the south. Choose wisely. \n " +
+                    "'Diamond or Sword' which direction to go?",
+                    Answer = "south",
                     Level = 2
                 },
                 new SceneData{

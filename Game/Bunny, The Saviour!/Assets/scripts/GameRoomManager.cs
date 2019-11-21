@@ -151,7 +151,10 @@ namespace Assets.scripts
         /// </summary>
         private void CheckTiltForAnsweringDirections()
         {
-            if (GameModel.CurrentLevel == 2)
+            if (MessageInputField != null && 
+                (!MessageInputField.isFocused) &&
+                (!Input.anyKeyDown) &&
+                GameModel.CurrentLevel == 2)
             {
                 float xdeg = Input.acceleration.x;
                 float ydeg = Input.acceleration.y;
