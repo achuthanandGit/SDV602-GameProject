@@ -972,8 +972,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b64a597bfb2bc7b478bb69b3fabb3151, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RetryButton: {fileID: 0}
-  ConnectionRetryImage: {fileID: 0}
 --- !u!1 &532930176
 GameObject:
   m_ObjectHideFlags: 0
@@ -2397,8 +2395,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b64a597bfb2bc7b478bb69b3fabb3151, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  RetryButton: {fileID: 0}
-  ConnectionRetryImage: {fileID: 0}
 --- !u!1 &1626749813
 GameObject:
   m_ObjectHideFlags: 0
